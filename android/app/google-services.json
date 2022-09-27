@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1066518135696",
+    "project_id": "i-call-404eb",
+    "storage_bucket": "i-call-404eb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1066518135696:android:f1839e76586e3e3b326915",
+        "android_client_info": {
+          "package_name": "info.socorp.i_call"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1066518135696-4pq21r61apbn41p0ejgs4l6dpk4bguod.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.socorp.i_call",
+            "certificate_hash": "b66efd96583e5df70b3ebfc3496f1c8c8dcfbdfd"
+          }
+        },
+        {
+          "client_id": "1066518135696-k8uv1qgfn472q2mrsi4bnkdbckonrvgp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHww14QuJh2dTYsaA7wVRNgeR2desLq3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1066518135696-k8uv1qgfn472q2mrsi4bnkdbckonrvgp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
