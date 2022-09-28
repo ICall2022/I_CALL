@@ -22,7 +22,7 @@ class FBCloudStore {
         await FirebaseFirestore.instance.collection('users').doc(_userik.uid).set({
           'email':userEmail,
           'name':userName,
-          'phone':userPhone.toString().substring(0,5) + ' ' + userPhone.toString().substring(5),
+          'phone':userPhone.toString(),
           'userImageUrl':downloadUrl,
           'userId': _userik.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch,
@@ -35,7 +35,7 @@ class FBCloudStore {
         await FirebaseFirestore.instance.collection('users').doc(_userik.uid).update({
           'email':userEmail,
           'name':userName,
-          'phone':userPhone.toString().substring(0,5) + ' ' + userPhone.toString().substring(5),
+          'phone':userPhone.toString(),
           'userImageUrl':downloadUrl,
           'createdAt': DateTime.now().millisecondsSinceEpoch,
           'FCMToken':prefs.get('FCMToken')?? 'NOToken',

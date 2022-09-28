@@ -3,10 +3,13 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:i_call/chatconatct.dart';
 import 'package:i_call/search.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Controllers/fb_messaging.dart';
@@ -31,6 +34,7 @@ class _recentState extends State<recent> {
     super.initState();
     NotificationController.instance.updateTokenToServer();
     getData();
+    getContact();
 
   }
 
@@ -235,92 +239,92 @@ appBar: AppBar(
             return Stack(
               children: [
                 ListView(
-                  shrinkWrap: true,
+                    shrinkWrap: true,
                     children: userSnapshot.data.docs.map((userData){
                       if (userData['userId'] == _userik.uid.toString()) {
                         return Container();
                       }
-                     else {
-                     return  StreamBuilder(
+                      else {
+                        return  StreamBuilder(
 
-                         stream: FirebaseFirestore.instance
-                             .collection('users')
-                             .doc(_userik.uid.toString())
-                             .collection('chatlist')
-                             .where('chatWith', isEqualTo: userData['userId'])
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(_userik.uid.toString())
+                              .collection('chatlist')
+                              .where('chatWith', isEqualTo: userData['userId'])
 
-                             .snapshots(),
-
-
-                         builder: (context ,chatid){
-                           return Stack(
-                             children: [
-                               Container(
-                                 child: (chatid.hasData && chatid.data.docs.length >0)
-                                     ? chatid.data.docs[0]['chatWith'] == userData['userId'] ? Padding(
-                                       padding: const EdgeInsets.all(8.0),
-                                       child: Column(
-                                         children: [
-                                           ListTile(
-                                   leading: ClipRRect(
-                                           borderRadius: BorderRadius.circular(15),
-                                           child: ImageController.instance.cachedImage(userData['userImageUrl']),
-                                   ),
-                                   title: Text(userData['name'],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                                             subtitle: Text((chatid.hasData && chatid.data.docs.length >0)
-                                                 ? chatid.data.docs[0]['lastChat']
-                                                 : userData['intro']),
-                                             trailing: Padding(padding: const EdgeInsets.fromLTRB(0, 8, 4, 4),
-                                                 child: (chatid.hasData && chatid.data.docs.length > 0)
-                                                     ? Container(
-                                                   width: 60,
-                                                   height: 50,
-                                                   child: Column(
-                                                     children: <Widget>[
-                                                       Text((chatid.hasData && chatid.data.docs.length >0)
-                                                           ? readTimestamp(chatid.data.docs[0]['timestamp'])
-                                                           : '',style: TextStyle(fontSize: size.width * 0.03),
-                                                       ),
-                                                       Padding(
-                                                           padding:const EdgeInsets.fromLTRB( 0, 5, 0, 0),
-                                                           child: CircleAvatar(
-                                                             radius: 9,
-                                                             child: Text(chatid.data.docs[0]['badgeCount'] == null ? '' : ((chatid.data.docs[0]['badgeCount'] != 0
-                                                                 ? '${chatid.data.docs[0]['badgeCount']}'
-                                                                 : '')),
-                                                               style: TextStyle(fontSize: 10),),
-                                                             backgroundColor: chatid.data.docs[0]['badgeCount'] == null ? Colors.transparent : (chatid.data.docs[0]['badgeCount'] != 0
-                                                                 ? Color(0xffDF6DA2)
-                                                                 : Colors.transparent),
-                                                             foregroundColor:Colors.white,
-                                                           )
-                                                       ),
-
-                                                     ],
-                                                   ),
-                                                 ) : Text('')),
-
-                                   onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl']),
-                                 ),
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 2.0,right: 8.0,left: 8.0),
-                                             child: Divider(),
-                                           )
-                                         ],
-                                       ),
-                                     ): null : null ),
+                              .snapshots(),
 
 
+                          builder: (context ,chatid){
+                            return Stack(
+                              children: [
+                                Container(
+                                    child: (chatid.hasData && chatid.data.docs.length >0)
+                                        ? chatid.data.docs[0]['chatWith'] == userData['userId'] ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          ListTile(
+                                            leading: ClipRRect(
+                                              borderRadius: BorderRadius.circular(15),
+                                              child: ImageController.instance.cachedImage(userData['userImageUrl']),
+                                            ),
+                                            title: Text(userData['name'],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                                            subtitle: Text((chatid.hasData && chatid.data.docs.length >0)
+                                                ? chatid.data.docs[0]['lastChat']
+                                                : userData['intro']),
+                                            trailing: Padding(padding: const EdgeInsets.fromLTRB(0, 8, 4, 4),
+                                                child: (chatid.hasData && chatid.data.docs.length > 0)
+                                                    ? Container(
+                                                  width: 60,
+                                                  height: 50,
+                                                  child: Column(
+                                                    children: <Widget>[
+                                                      Text((chatid.hasData && chatid.data.docs.length >0)
+                                                          ? readTimestamp(chatid.data.docs[0]['timestamp'])
+                                                          : '',style: TextStyle(fontSize: size.width * 0.03),
+                                                      ),
+                                                      Padding(
+                                                          padding:const EdgeInsets.fromLTRB( 0, 5, 0, 0),
+                                                          child: CircleAvatar(
+                                                            radius: 9,
+                                                            child: Text(chatid.data.docs[0]['badgeCount'] == null ? '' : ((chatid.data.docs[0]['badgeCount'] != 0
+                                                                ? '${chatid.data.docs[0]['badgeCount']}'
+                                                                : '')),
+                                                              style: TextStyle(fontSize: 10),),
+                                                            backgroundColor: chatid.data.docs[0]['badgeCount'] == null ? Colors.transparent : (chatid.data.docs[0]['badgeCount'] != 0
+                                                                ? Color(0xffDF6DA2)
+                                                                : Colors.transparent),
+                                                            foregroundColor:Colors.white,
+                                                          )
+                                                      ),
+
+                                                    ],
+                                                  ),
+                                                ) : Text('')),
+
+                                            onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl']),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 2.0,right: 8.0,left: 8.0),
+                                            child: Divider(),
+                                          )
+                                        ],
+                                      ),
+                                    ): null : null ),
 
 
-                             ],
-                           );
-                         },
-                       );
+
+
+                              ],
+                            );
+                          },
+                        );
 
                       }
 
-                }
+                    }
                     ).toList()
                 ),
               ],
@@ -366,6 +370,35 @@ appBar: AppBar(
         print(e.message);
       }
     }
+    int i;
+  void getContact() async {
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+
+    try {
+      await Permission.contacts.request();
+      final sw = Stopwatch()
+        ..start();
+      final contacts = await FastContacts.allContacts;
+      sw.stop();
+      _contacts = contacts;
+
+      for (i = 0; i < _contacts.length; i++) {
+
+        FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
+          'name': _contacts[i].displayName.toString(),
+          'phone': _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),''),
+
+
+
+        });
+
+      }
+    }
+    on PlatformException catch (e) {
+
+    }
+  }
+  List<Contact> _contacts = const [];
   }
 
 

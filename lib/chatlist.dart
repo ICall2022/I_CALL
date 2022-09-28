@@ -32,7 +32,8 @@ class _ChatList extends State<ChatList> with LocalNotificationView {
 
   @override
   void initState() {
-    getContact();
+    underadd();
+    underadd2();
 
 
     super.initState();
@@ -170,55 +171,53 @@ class _ChatList extends State<ChatList> with LocalNotificationView {
           ),
         ),
       ),
-body:  StreamBuilder(
-  stream: FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('contacts').snapshots(),
-  builder: (context ,AsyncSnapshot<QuerySnapshot> snapshots){
-    if(!snapshots.hasData){
-      return CircularProgressIndicator();
-    }
-    return Stack(
-      children: [
-        ListView(
-          shrinkWrap: true,
-          children: snapshots.data.docs.map((firstcollection) {
-            return  StreamBuilder(
+         body:  RefreshIndicator(
+           onRefresh: (){
+             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatList()));
 
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-              .where('phone',whereIn: [firstcollection['phone'],firstcollection['phone'].toString().substring(4)])
+           },
+           child: StreamBuilder(
+             stream: result.isNotEmpty ? FirebaseFirestore.instance.collection('users').where('userId',whereIn: result).snapshots() :FirebaseFirestore.instance.collection('demo').snapshots(),
+               builder: (context ,AsyncSnapshot<QuerySnapshot> snapshots){
+               if(snapshots?.data == null ){
+                 return Scaffold(
+                   body: Center(
+                     child: CircularProgressIndicator(),
+                   ),
+                 );
+               }
 
-                  .snapshots(),
-
-
-              builder: (context ,AsyncSnapshot<QuerySnapshot> chatid){
-                return Stack(
-                  children: [
-                    ListView(
-                      shrinkWrap: true,
-                      children: chatid.data.docs.map((secoundcollection) {
-                        return Text(firstcollection['name']);
-                      }).toList(),
-                    )
+               return ListView(
+                 children: snapshots.data.docs.map((userData){
+                   return   Padding(
+                     padding: const EdgeInsets.all(8.0),
+                     child: ListTile(
+                       leading: ClipRRect(
+                         borderRadius: BorderRadius.circular(15),
+                         child: ImageController.instance.cachedImage(userData['userImageUrl']),
+                       ),
+                       title: Text(userData['name'],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
 
 
 
+                       onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl']),
+                     ),
+                   );
 
-                  ],
-                );
-              },
-            );
-          }).toList(),
-        ),
-      ],
-    );
+                     }).toList()
+
+
+               );
+
+
   },
-)
+),
+         )
 
     );
   }
 
-  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID,
-      selectedUserName, selectedUserThumbnail) async {
+  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID, selectedUserName, selectedUserThumbnail) async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
@@ -270,8 +269,8 @@ body:  StreamBuilder(
   }
 
   void getContact() async {
-    final snapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts3').get();
-    if(snapshot.docs.length == 0) {
+    final snapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+
       try {
         await Permission.contacts.request();
         final sw = Stopwatch()
@@ -282,10 +281,9 @@ body:  StreamBuilder(
 
         for (i = 0; i < _contacts.length; i++) {
 
-          FirebaseFirestore.instance.collection("users").doc(
-              _userik.uid.toString()).collection('contacts3').doc(i.toString()).set({
+          FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
             'name': _contacts[i].displayName.toString(),
-            'phone': _contacts[i].phones.first.toString(),
+            'phone': _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),''),
 
 
 
@@ -297,67 +295,48 @@ body:  StreamBuilder(
 
       }
     }
-    else {
-      try {
-        await Permission.contacts.request();
-        final sw = Stopwatch()
-          ..start();
-        final contacts = await FastContacts.allContacts;
-        sw.stop();
-        _contacts = contacts;
-        print(contacts.length.toString());
-        for (i = 0; i < _contacts.length; i++) {
-          FirebaseFirestore.instance.collection("users").doc(
-              _userik.uid.toString()).collection('contacts2').doc(i.toString()).update({
-            'name': _contacts[i].displayName.toString(),
-            'phone': _contacts[i].phones.first.toString(),
-            'phone2' :_contacts[i].phones.first.toString().substring(4,9)+ _contacts[i].phones.first.toString().substring(10)
 
-          });
-        }
-      }
-      on PlatformException catch (e) {
+  underadd() async {
+    int i;
+    var document = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+    for (i = 0; i < document.docs.length; i++) {
+      setState(() {
+        phoneno.add(document.docs[i]['phone']);
+      });
 
-      }
     }
-
+    print(phoneno);
+  }
+  underadd2() async {
+    int i;
+    var document = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+    for (i = 0; i < document.docs.length; i++) {
+      if(document.docs[i]['phone'].toString().length >= 10)
+        setState(() {
+          phoneno2.add(document.docs[i]['phone'].toString().substring(2));
+        });
 
 
     }
+    var document2 = await  FirebaseFirestore.instance.collection("users").get();
+    for (i = 0; i <document2.docs.length ; i++) {
+      if(phoneno.contains(document2.docs[i]['phone']) || phoneno2.contains(document2.docs[i]['phone'])){
+        setState(() {
+          result.add(document2.docs[i]['userId'].toString());
+        });
+
+      }
+    }
+    print("res :${result}");
+    print(phoneno2);
+  }
+
+
   List<Contact> _contacts = const [];
   List phoneno =  [];
-  phone() {
-    int count =0;
+  List phoneno2 =  [];
+  List result =  [];
 
-    FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get().then((value) =>
-
-    {
-      setState(() {
-        count = value.docs.length;
-      }),
-
-      for(int i = 0; i< count.toInt(); i++){
-        if(value.docs[i]["phone"].toString().contains("+91")){
-          FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contac').doc(i.toString()).set(
-              {
-                'phone2' :value.docs[i]["phone"].toString().substring(4,9)+ value.docs[i]["phone"].toString().substring(10)
-
-              }
-              ),
-
-        }
-
-      },
-      print("List : ${user.toString()}"),
-      print(phoneno.length),
-      setState(() {
-        ln=phoneno.length;
-
-      }),
-
-
-    });
-  }
   }
 
 
