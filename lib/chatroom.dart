@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:i_call/viewprofile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Controllers/fb_firestore.dart';
@@ -20,7 +21,7 @@ import 'subWidgets/common_widgets.dart';
 import 'subWidgets/local_notification_view.dart';
 
 class ChatRoom extends StatefulWidget {
-  ChatRoom(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail);
+  ChatRoom(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail,this.phonenumber);
 
   String myID;
   String myName;
@@ -30,6 +31,7 @@ class ChatRoom extends StatefulWidget {
   String chatID;
   String selectedUserName;
   String selectedUserThumbnail;
+  String phonenumber;
 
   @override _ChatRoomState createState() => _ChatRoomState();
 }
@@ -255,7 +257,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                        builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail)));
+                        builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber)));
               },
             ),
           ],
@@ -287,7 +289,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail)));
+                      builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber)));
                 },
             ),
           ],
@@ -406,21 +408,28 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
                     value: 3,
 
 
-// row has two child icon and text
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.person,color: Colors.pinkAccent,),
-                            SizedBox(
+
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.person,color: Colors.pinkAccent,),
+                              SizedBox(
 // sized box with width 10
-                              width: 10,
-                            ),
-                            Text("View Contact")
-                          ],
-                        ),
-                        Divider(),
-                      ],
+                                width: 10,
+                              ),
+                              Text("View Contact")
+                            ],
+                          ),
+                          Divider(),
+                        ],
+                      ),
                     ),
                   ),
                 ],

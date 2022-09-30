@@ -200,7 +200,7 @@ class _ChatList extends State<ChatList> with LocalNotificationView {
 
 
 
-                       onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl']),
+                       onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl'],userData['phone']),
                      ),
                    );
 
@@ -217,7 +217,7 @@ class _ChatList extends State<ChatList> with LocalNotificationView {
     );
   }
 
-  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID, selectedUserName, selectedUserThumbnail) async {
+  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID, selectedUserName, selectedUserThumbnail,phonenumber) async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
@@ -237,7 +237,8 @@ class _ChatList extends State<ChatList> with LocalNotificationView {
                       selectedUserID,
                       chatID,
                       selectedUserName,
-                      selectedUserThumbnail)));
+                      selectedUserThumbnail,
+                  phonenumber)));
     } catch (e) {
       print(e.message);
     }

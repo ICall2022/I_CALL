@@ -7,8 +7,13 @@ import 'package:fast_contacts/fast_contacts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:i_call/Editprofile.dart';
+import 'package:i_call/about.dart';
 import 'package:i_call/chatconatct.dart';
 import 'package:i_call/search.dart';
+import 'package:i_call/terms.dart';
+import 'package:i_call/contact.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -120,24 +125,88 @@ appBar: AppBar(
 
 
               PopupMenuItem(
+                value: 0,
+
+
+// row has two child icon and text
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context)=> EditProfile())
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.person,color: Colors.pinkAccent,),
+                          SizedBox(
+// sized box with width 10
+                            width: 10,
+                          ),
+                          Text("Edit Profile")
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
+                value: 1,
+
+
+// row has two child icon and text
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context)=> About())
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.info,color: Colors.pinkAccent,),
+                          SizedBox(
+// sized box with width 10
+                            width: 10,
+                          ),
+                          Text("About us")
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
                 value: 2,
 
 
 // row has two child icon and text
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.person,color: Colors.pinkAccent,),
-                        SizedBox(
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context)=> ContactPage())
+                    );
+                  },
+                  child: Column(
+
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.phone,color: Colors.pinkAccent,),
+                          SizedBox(
 // sized box with width 10
-                          width: 10,
-                        ),
-                        Text("Edit Profile")
-                      ],
-                    ),
-                    Divider(),
-                  ],
+                            width: 10,
+                          ),
+                          Text("Contact us")
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
               PopupMenuItem(
@@ -145,66 +214,56 @@ appBar: AppBar(
 
 
 // row has two child icon and text
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.info,color: Colors.pinkAccent,),
-                        SizedBox(
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context)=> Terms())
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.text_snippet_outlined,color: Colors.pinkAccent,),
+                          SizedBox(
 // sized box with width 10
-                          width: 10,
-                        ),
-                        Text("About us")
-                      ],
-                    ),
-                    Divider(),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 3,
-
-
-// row has two child icon and text
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.phone,color: Colors.pinkAccent,),
-                        SizedBox(
-// sized box with width 10
-                          width: 10,
-                        ),
-                        Text("Contact us")
-                      ],
-                    ),
-                    Divider(),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 3,
-
-
-// row has two child icon and text
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.text_snippet_outlined,color: Colors.pinkAccent,),
-                        SizedBox(
-// sized box with width 10
-                          width: 10,
-                        ),
-                        Text("T & C")
-                      ],
-                    ),
-                    Divider(),
-                  ],
+                            width: 10,
+                          ),
+                          Text("T & C")
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
             ],
             onSelected: (value) {
+              if(value == 0){
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)=> EditProfile())
+                );
+
+              }
+              else if(value == 1){
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)=> About())
+                );
+
+              }
+              else if(value == 2){
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)=> ContactPage())
+                );
+
+              }
+              else if(value == 3){
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)=> Terms())
+                );
+
+              }
+
 
             }),
       ),
@@ -304,7 +363,7 @@ appBar: AppBar(
                                                   ),
                                                 ) : Text('')),
 
-                                            onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl']),
+                                            onTap: () => _moveTochatRoom(userData['FCMToken'],userData['userId'],userData['name'],userData['userImageUrl'],userData['phone']),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(top: 2.0,right: 8.0,left: 8.0),
@@ -343,7 +402,7 @@ appBar: AppBar(
     );
   }
 
-  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID,selectedUserName, selectedUserThumbnail) async {
+  Future<void> _moveTochatRoom(selectedUserToken, selectedUserID,selectedUserName, selectedUserThumbnail,phonenumber) async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
@@ -365,7 +424,9 @@ appBar: AppBar(
                         selectedUserID,
                         chatID,
                         selectedUserName,
-                        selectedUserThumbnail)));
+                        selectedUserThumbnail,
+                        phonenumber
+                    )));
       } catch (e) {
         print(e.message);
       }

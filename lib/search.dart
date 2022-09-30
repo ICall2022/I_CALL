@@ -100,7 +100,7 @@ class _CloudFirestoreSearchState extends State<CloudFirestoreSearch> {
                   title: Text(data['name']),
 
 
-                  onTap: () => _moveTochatRoom(data['FCMToken'],data['userId'],data['name'],data['userImageUrl']),
+                  onTap: () => _moveTochatRoom(data['FCMToken'],data['userId'],data['name'],data['userImageUrl'],data['phone']),
                 ),
               );
             },
@@ -110,7 +110,7 @@ class _CloudFirestoreSearchState extends State<CloudFirestoreSearch> {
     );
   }
   Future<void> _moveTochatRoom(selectedUserToken, selectedUserID,
-      selectedUserName, selectedUserThumbnail) async {
+      selectedUserName, selectedUserThumbnail,phonenumber) async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
@@ -130,7 +130,9 @@ class _CloudFirestoreSearchState extends State<CloudFirestoreSearch> {
                       selectedUserID,
                       chatID,
                       selectedUserName,
-                      selectedUserThumbnail)));
+                      selectedUserThumbnail,
+                    phonenumber
+                  )));
     } catch (e) {
       print(e.message);
     }
