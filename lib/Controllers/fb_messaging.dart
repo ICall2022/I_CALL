@@ -125,7 +125,7 @@ class NotificationController {
               'title': '$myName',
               'badge':'$unReadMSGCount',//'$unReadMSGCount'
               "sound" : "default",
-              "image" : myImageUrl
+
             },
             // 'priority': 'high',
             'data': <String, dynamic>{
@@ -133,7 +133,7 @@ class NotificationController {
               'id': '1',
               'status': 'done',
               'chatroomid': chatID,
-              'userImage':myImageUrl,
+
               'userName':'$myName',
               'message': messageType == 'text' ? '$textFromTextField' : '(Photo)',
             },

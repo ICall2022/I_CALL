@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:i_call/Contacts/usermodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class FBCloudStore {
   var date = new DateTime.now();
@@ -77,7 +78,7 @@ class FBCloudStore {
 
   Future<void> updateUserToken(userID, token) async {
     User _userik = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance.collection('users').doc(_userik.uid).update({
+     FirebaseFirestore.instance.collection('users').doc(_userik.uid).update({
       'FCMToken':token,
     });
   }
@@ -132,7 +133,7 @@ class FBCloudStore {
       userBadgeCount++;
     }
 
-    await FirebaseFirestore.instance
+     FirebaseFirestore.instance
         .collection('users')
         .doc(documentID)
         .collection('chatlist')
@@ -146,7 +147,7 @@ class FBCloudStore {
   }
 
   Future sendMessageToChatRoom(chatID,myID,selectedUserID,content,messageType) async {
-    await FirebaseFirestore.instance
+     FirebaseFirestore.instance
         .collection('chatroom')
         .doc(chatID)
         .collection(chatID)
@@ -157,14 +158,17 @@ class FBCloudStore {
       'content': content,
       'type':messageType,
       'isread':false,
-      'time': date.hour
-    });
-    await FirebaseFirestore.instance.collection('chatroom')
-        .doc(chatID).set({
-      "status" : "not"
-
+      'time': date.hour,
 
     });
+     final result =  await FirebaseFirestore.instance.collection('chatroom').doc(chatID).collection(chatID).get();
+     if (result.size == 0) {
+       FirebaseFirestore.instance.collection('chatroom')
+           .doc(chatID).set({
+         "status": "not"
+       });
+     }
+
   }
   Future < List < UserModel >  > getAppContacts ( ) async {
     try {

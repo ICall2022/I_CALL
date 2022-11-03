@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/text_field_container.dart';
+import 'package:lottie/lottie.dart';
 
 import 'background.dart';
 import 'lodinotp.dart';
@@ -31,19 +32,16 @@ class _BodyloginState extends State<Bodylogin> {
 
             Container(
 
-                width: size.width/2.5,
-                height: size.height /5.9,
-                decoration: BoxDecoration(
+                width: size.width/0.5,
+                height: size.height /2.9,
 
-                  image: DecorationImage(
-                      image: AssetImage('assets/icalllogo.png'),
-                      fit: BoxFit.fill
-                  ),
 
-                )),
-            SizedBox(height: size.height * 0.1),
+                  child: Lottie.asset("assets/Reg.json"),
+
+                ),
+
             Text(
-                "Welcome,",
+                "Register with us,",
                 style: GoogleFonts.raleway(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -56,7 +54,7 @@ class _BodyloginState extends State<Bodylogin> {
               padding: const EdgeInsets.symmetric(horizontal: 17.0),
               child: Text(
 
-                  "Enter your mobile number for register or login in our app",
+                  "Kindly enter your phone number",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.raleway(
                       fontSize: 14,
@@ -70,7 +68,7 @@ class _BodyloginState extends State<Bodylogin> {
 
 
             Padding(
-              padding: const EdgeInsets.only(top: 120,bottom: 2),
+              padding: const EdgeInsets.only(top: 60,bottom: 2),
               child: TextFieldContainer(
                 child: TextField(
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/main.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:responsive_widgets/responsive_widgets.dart';
 
@@ -58,7 +59,7 @@ class _LoginotpState extends State<Loginotp> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           brightness: Brightness.dark,
-          title: TextResponsive("Enter OTP Code",
+          title: TextResponsive("Verifying your number",
               style: GoogleFonts.raleway(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -71,27 +72,21 @@ class _LoginotpState extends State<Loginotp> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: size.height * 0.1),
+
               Container(
 
-                  width: size.width/2.5,
-                  height: size.height /5.9,
-                  decoration: BoxDecoration(
-
-                    image: DecorationImage(
-                        image: AssetImage('assets/icalllogo.png'),
-                        fit: BoxFit.fill
-                    ),
-
-                  )),
+                  width: size.width/1.5,
+                  height: size.height /3.9,
+               child:   Lottie.asset("assets/OTP.json"),
+                 ),
 
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: ContainerResponsive(
 
                   margin: EdgeInsets.only(top: 40),
-                  child: TextResponsive('A Code has be send to', style:
-                  TextStyle(fontWeight: FontWeight.w500,fontSize: 25),
+                  child: const TextResponsive("Auto-verifying your number...", style:
+                  TextStyle(fontWeight: FontWeight.w500,fontSize: 20),
                   textAlign: TextAlign.center,
                   ),
                 ),
@@ -99,7 +94,7 @@ class _LoginotpState extends State<Loginotp> {
               ),
               ContainerResponsive(
 
-                margin: EdgeInsets.only(top: 1),
+                margin: EdgeInsets.only(top: 2),
                 child: TextResponsive("+91 ${widget.phone}", style:
                 TextStyle(fontWeight: FontWeight.w400,fontSize: 20,color: Color(0xffFE67C4)),
                   textAlign: TextAlign.center,

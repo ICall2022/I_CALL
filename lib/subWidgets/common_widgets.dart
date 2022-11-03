@@ -1,6 +1,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import 'full_photo.dart';
 
@@ -8,8 +9,10 @@ Widget loadingCircle(bool value,){
   return Positioned(
     child: value ? Container(
       child: Center(
-        child: CircularProgressIndicator(),
-      ),
+        child:  Container(
+            width: 200,
+            height: 200,
+            child: Lottie.asset("assets/Loading2.json")),),
       color: Colors.white.withOpacity(0.7),
     ) : Container(),
   );

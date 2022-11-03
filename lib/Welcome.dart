@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/Background2.dart';
+import 'package:i_call/Welcome2.dart';
 import 'package:i_call/login.dart';
 import 'package:i_call/rounded_button.dart';
+import 'package:lottie/lottie.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key key}) : super(key: key);
@@ -23,21 +25,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
 
+
+
             Container(
 
-                width: size.width/2.5,
-                height: size.height /5.9,
-                decoration: BoxDecoration(
-
-                  image: DecorationImage(
-                      image: AssetImage('assets/icalllogo.png'),
-                      fit: BoxFit.fill
-                  ),
-
-                )),
+                width: size.width/0.5,
+                height: size.height /2.9,
+              child: Lottie.asset("assets/Welocome.json"),
+               ),
             SizedBox(height: size.height * 0.1),
             Text(
-              "The best app for privacy",
+              "Hi, \n Welcome to I CALL",
+              textAlign: TextAlign.center,
               style: GoogleFonts.raleway(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -47,7 +46,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
             ),
             Text(
-              "Enjoy your fastest chatting",
+              "The best app for your privacy",
               style: GoogleFonts.raleway(
                 fontSize: 17,
                 fontWeight: FontWeight.w300,
@@ -64,9 +63,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),*/
 
           Padding(
-            padding: const EdgeInsets.only(top: 180,bottom: 2),
+            padding: const EdgeInsets.only(top: 80,bottom: 2),
             child: Container(
-              width: 265,
+              width: 205,
               height: 55,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(21),
@@ -82,10 +81,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: TextButton(
                 onPressed: (){
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context)=> loginpage())
+                    MaterialPageRoute(builder: (context)=> WelcomeScreen2())
                   );
                 },
-                child: Text("Let's Start", style: GoogleFonts.poppins(
+                child: Text("Next", style: GoogleFonts.poppins(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,

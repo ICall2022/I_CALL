@@ -3,8 +3,7 @@ const String firebaseCloudserverToken = 'AAAA-FFvQ5A:APA91bH1zapl5UGqDf5wv_iAaOL
 const String firebaseCloudvapidKey = 'BMzSwLt84ZSae6Qk1Uc_eNAxsDzph5n9rLeJsn_kb9ywffJ-_qcK2zMUGSvCVJ5CfdTl7_Cx_MAAo0RcsQipZKA';
 const String youtubeChannelLink = 'https://www.youtube.com/channel/UCLNCErWFQ6LZoaV_JKOq_lQ';
 
-const chatInstruction = """Welcome to I CALL messaging App.
+const chatInstruction = """Hello Wecome to join with  
+I call App team. 
 
-Your chats will be automatically deleted after one hour. To save it kindly change the option in menu above .
-
-Thank you for using I CALL""";
+This app's unique feature is "auto delete" feature. All your messages and media files will be deleted automatically within 2 days. You will feel good once you see your emptied space in your mobile phone. If you want to save there is save button which has to be touched by you and the same will be saved. Enjoy your time which is precious!""";

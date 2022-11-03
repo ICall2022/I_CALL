@@ -4,7 +4,9 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:i_call/viewprofile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Controllers/fb_firestore.dart';
@@ -18,8 +20,9 @@ import 'subWidgets/chatListTile/string_list_tile.dart';
 import 'subWidgets/common_widgets.dart';
 import 'subWidgets/local_notification_view.dart';
 
+
 class ChatRoom2 extends StatefulWidget {
-  ChatRoom2(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail,this.message);
+  ChatRoom2(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail,this.phonenumber,this.first ,{Key key}) : super(key: key);
 
   String myID;
   String myName;
@@ -29,34 +32,35 @@ class ChatRoom2 extends StatefulWidget {
   String chatID;
   String selectedUserName;
   String selectedUserThumbnail;
-  String message;
+  String phonenumber;
+  int first;
 
   @override _ChatRoom2State createState() => _ChatRoom2State();
 }
 
 class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,LocalNotificationView {
-  Timestamp  timestamp= Timestamp.fromDate(DateTime.now().subtract(Duration(minutes: 2)));
-  final TextEditingController _msgTextController = new TextEditingController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ScrollController _chatListController = ScrollController();
+  Timestamp  timestamp= Timestamp.fromDate(DateTime.now().subtract(const Duration(minutes: 10)));
+    TextEditingController _msgTextController =   new TextEditingController();
+   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+   ScrollController _chatListController = ScrollController();
   String messageType = 'text';
   int chatListLength = 20;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('didChangeAppLifecycleState');
+     // //print('didChangeAppLifecycleState');
     setState(() {
       switch(state) {
         case AppLifecycleState.resumed:
           FBCloudStore.instanace.updateMyChatListValues(widget.myID,widget.chatID,true);
-          print('AppLifecycleState.resumed');
+      //    //print('AppLifecycleState.resumed');
           break;
         case AppLifecycleState.inactive:
-          print('AppLifecycleState.inactive');
+          //print('AppLifecycleState.inactive');
           FBCloudStore.instanace.updateMyChatListValues(widget.myID,widget.chatID,false);
           break;
         case AppLifecycleState.paused:
-          print('AppLifecycleState.paused');
+          //print('AppLifecycleState.paused');
           FBCloudStore.instanace.updateMyChatListValues(widget.myID,widget.chatID,false);
           break;
         case AppLifecycleState.detached:
@@ -66,6 +70,49 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
     });
   }
   bool status = false;
+  int a=0;
+  User _userik = FirebaseAuth.instance.currentUser;
+  String mynameon = "Demo";
+
+  firsttime()async{
+    final snap = await FirebaseFirestore.instance.
+    collection('users')
+        .doc(_userik.uid.toString()) // varuId in your case
+        .get();
+
+    if (snap['first'] == 0) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 1
+      }
+      );
+    }
+    if (snap['first'] == 1) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 2
+      }
+      );
+
+
+
+    }
+    if (snap['first'] == 2) {
+      setState(() {
+        a=1;
+      });
+
+    }
+
+  }
   Future checkDocuement() async {
     final snapShot = await FirebaseFirestore.instance.
     collection('chatroom')
@@ -73,7 +120,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
         .get();
 
     if (snapShot['status'] == "save") {
-      print('Cannot Delete');
+      //print('Cannot Delete');
       setState(() {
         status=true;
       });
@@ -92,25 +139,33 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
   bool emojiShowing = false;
 
   _onEmojiSelected(Emoji emoji) {
-    print('_onEmojiSelected: ${emoji.emoji}');
+    //print('_onEmojiSelected: ${emoji.emoji}');
   }
 
   _onBackspacePressed() {
-    print('_onBackspacePressed');
+    //print('_onBackspacePressed');
+  }
+
+  myname() async {
+    var  document = await FirebaseFirestore.instance.collection('users').doc(widget.selectedUserID).collection('Mycontacts').doc(widget.myID).get();
+    Map<String,dynamic> value = document.data();
+    setState(() {
+      mynameon = value['name'];
+
+    });
   }
 
 
   @override
   void initState() {
+    myname();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     FBCloudStore.instanace.updateMyChatListValues(widget.myID,widget.chatID,true);
-    print(timestamp.millisecondsSinceEpoch.toString());
+    //print(timestamp.millisecondsSinceEpoch.toString());
+    firsttime();
     checkDocuement();
-    print(status.toString());
-    setState(() {
-      _msgTextController.text= widget.message.toString();
-    });
+    //print(status.toString());
 
     if(status == false){
 
@@ -167,7 +222,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
   Future savechat1() async {
     await FirebaseFirestore.instance
         .collection('chatroom')
-        .doc(widget.chatID).update(
+        .doc(widget.chatID).set(
       {
         "status": "save",
 
@@ -197,7 +252,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title:  Text('Do you want to save this chat ?'),
+          title:  const Text('Do you want to save this chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: const <Widget>[
@@ -215,7 +270,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.message)));
+                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.first)));
               },
             ),
           ],
@@ -229,7 +284,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title:  Text('Are you sure of disabling the save chat ?'),
+          title:  const Text('Are you sure of disabling the save chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: const <Widget>[
@@ -247,7 +302,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.message)));
+                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.first)));
               },
             ),
           ],
@@ -272,20 +327,44 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
               children: [
                 IconButton(onPressed: (){
                   Navigator.of(context).pop();
-                }, icon: Icon(Icons.arrow_back_ios_rounded)),
+                }, icon: const Icon(Icons.arrow_back_ios_rounded)),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                      width: 50,
-                      height: 50,
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) =>
+                                ViewProfile(widget.selectedUserThumbnail,
+                                    widget.selectedUserName,
+                                    widget.phonenumber))
+                        );
+                      },
+                    child: Container(
+                        width: 50,
+                        height: 50,
 
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(widget.selectedUserThumbnail))
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: ImageController2.instance
+                                .cachedImage(widget.selectedUserThumbnail))
 
+                    ),
                   ),
                 ),
-                Text(widget.selectedUserName),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                      );
+
+                    },
+                    child: Container(
+                        padding:  EdgeInsets.only(right: 30.0),
+                        child: Text(widget.selectedUserName.toString(), overflow: TextOverflow.ellipsis,  maxLines: 1,
+                          softWrap: false,)),
+                  ),
+                ),
 
               ],
             ),
@@ -302,8 +381,8 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
 
                   ),
                   child: PopupMenuButton<int>(
-                      offset: Offset(0, 40),
-                      color: Colors.white,
+                      offset: const Offset(0, 40),
+                      color: Colors.white, 
                       elevation: 2,
                       shape: ContinuousRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -311,20 +390,13 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                       itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
 
                         status == true?        PopupMenuItem(
-                          value: 1,
-                          onTap: (){
+                          value: 3,
 
-                            Future.delayed(
-                                const Duration(seconds: 0),
-                                    () => _showMyDialog2()
-
-                            );
-                          },
 
                           child: Column(
                             children: [
                               Row(
-                                children: [
+                                children: const [
                                   Icon(Icons.download_done_outlined,color: Colors.pinkAccent,),
                                   SizedBox(
 // sized box with width 10
@@ -333,23 +405,17 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                                   Text("Chat is Saved")
                                 ],
                               ),
-                              Divider(),
+                              const  Divider(),
                             ],
                           ),
                         ) : PopupMenuItem(
-                          onTap: (){
-                            Future.delayed(
-                                const Duration(seconds: 0),
-                                    () => _showMyDialog1()
 
-                            );
-                          },
                           value: 2,
 // row has two child icon and text
                           child: Column(
                             children: [
                               Row(
-                                children: [
+                                children: const [
                                   Icon(Icons.monitor_heart,color: Colors.pinkAccent,),
                                   SizedBox(
 // sized box with width 10
@@ -358,21 +424,21 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                                   Text("Save Chat")
                                 ],
                               ),
-                              Divider(),
+                              const   Divider(),
                             ],
                           ),
                         ),
                         PopupMenuItem(
-                          value: 3,
+                          value: 1,
 
 
-// row has two child icon and text
+
                           child: Column(
                             children: [
                               Row(
-                                children: [
-                                  Icon(Icons.person,color: Colors.pinkAccent,),
-                                  SizedBox(
+                                children: const [
+                                   Icon(Icons.person,color: Colors.pinkAccent,),
+                                    SizedBox(
 // sized box with width 10
                                     width: 10,
                                   ),
@@ -385,8 +451,28 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                         ),
                       ],
                       onSelected: (value) {
+                        if(value == 2){
+                          Future.delayed(
+                              const Duration(seconds: 0),
+                                  () => _showMyDialog1());
 
-                      }),
+                        }
+                        else if(value == 1){
+
+                            Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                            );
+                        }
+                        else if(value == 3){
+                          Future.delayed(
+                              const Duration(seconds: 0),
+                                  () => _showMyDialog2());
+
+
+                        }
+                      }
+
+                  ),
                 ),
               )
             ],
@@ -421,11 +507,31 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
               orderBy('timestamp',descending: false).
               snapshots(),
               builder: (context,snapshot) {
-                if (!snapshot.hasData) return LinearProgressIndicator();
+                if (!snapshot.hasData) return Center(child: const CircularProgressIndicator());
                 return Stack(
                   children: <Widget>[
                     Column(
                       children: <Widget>[
+                        widget.first == 0 ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                decoration:const BoxDecoration(
+                color:Color(0xffF8E6EE),
+                borderRadius: BorderRadius.all(
+                Radius.circular(25.0)
+                )
+                ),
+                child:const Padding(
+                padding:  EdgeInsets.all(16.0),
+                child: Text("""Hello Welcome to join with  
+I call App team. 
+
+This app's unique feature is "auto delete" feature. All your messages and media files will be deleted automatically within 2 days. You will feel good once you see your emptied space in your mobile phone. If you want to save there is save button which has to be touched by you and the same will be saved. Enjoy your time which is precious!"""
+                  ,textAlign: TextAlign.center,),
+                ),
+                ),
+                ) : Container(),
+
                         Expanded(
                           child: ListView(
                               reverse: true,
@@ -479,64 +585,87 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
   }
 
   Widget _buildTextComposer() {
-    return new IconTheme(
-      data: new IconThemeData(color: Theme.of(context).accentColor),
+    return IconTheme(
+      data:  IconThemeData(color: Theme.of(context).colorScheme.secondary),
       child: Padding(
         padding: const EdgeInsets.only(top: 12.0,left: 15.0,right: 15.0,bottom: 30),
         child: Column(
           children: [
-            new Container(
+            Container(
               height: 67,
               width: 366,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   color: Color(0xffF8E6EE)
               ),
-              child: new Row(
+              child: Row(
                   children: <Widget>[
-                    new Container(
-                      margin: new EdgeInsets.symmetric(horizontal: 2.0),
-                      child: new IconButton(
-                          icon: new Icon(Icons.emoji_emotions_outlined,color: Color(0xffFC1982),),
+                     Container(
+                      margin:  EdgeInsets.symmetric(horizontal: 2.0),
+                      child:  IconButton(
+                          icon: const Icon(Icons.emoji_emotions_outlined,color: Color(0xffFC1982),),
                           onPressed: () {
                             setState(() {
                               emojiShowing = !emojiShowing;
                             });
-                            ImageController.instance.cropImageFromFile().then((croppedFile) {
-                              if (croppedFile != null) {
-                                setState(() { messageType = 'image'; });
-                                _saveUserImageToFirebaseStorage(croppedFile);
-                              }else {
-                                showAlertDialog(context,'Pick Image error');
-                              }
-                            }
-                            );
+
 
                           }),
                     ),
-                    new Flexible(
-                      child: new TextField(
+                     Flexible(
+                      child:  TextField(
                         controller: _msgTextController,
                         onSubmitted: _handleSubmitted,
-                        decoration: new InputDecoration.collapsed(
+                        decoration: const InputDecoration.collapsed(
                             hintText: "Send a message"),
                       ),
                     ),
+                    RotationTransition(
+                      turns: AlwaysStoppedAnimation(30 / 360),
+                      child:  Container(
 
+
+                        margin:  EdgeInsets.symmetric(horizontal: 2.0),
+                        child:  IconButton(
+
+                            icon:  Icon(Icons.attach_file_rounded,color: Color(0xffFC1982),),
+                            onPressed: () {
+                              print("oki");
+
+                              ImageController2.instance.cropImageFromFile().then((croppedFile) {
+                                if (croppedFile != null) {
+                                  setState(() { messageType = 'image'; });
+                                  _saveUserImageToFirebaseStorage(croppedFile);
+                                }else {
+
+                                }
+                              }
+                              );
+
+                            }),
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: new Container(
+                      padding: const EdgeInsets.only(top:8.0,bottom: 8,right: 8,left: 1),
+                      child:  Container(
                         height: 52,
                         width: 52,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
                           color: Color(0xffFC1982),
                         ),
-                        margin: new EdgeInsets.symmetric(horizontal: 2.0),
+                        margin:  EdgeInsets.symmetric(horizontal: 2.0),
                         child: GestureDetector(
                           onTap: (){
+
                             setState(() { messageType = 'text'; });
+
                             _handleSubmitted(_msgTextController.text);
+                            _getUnreadMSGCountThenSendMessage();
+
+
+
+
                           },
 
                           child:  Image.asset("assets/send.png"),
@@ -606,32 +735,29 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
     }
   }
 
-  Future<void> _handleSubmitted(String text) async {
+  Future<void> _handleSubmitted(String text)  {
     try {
-      await FBCloudStore.instanace.sendMessageToChatRoom(widget.chatID,widget.myID,widget.selectedUserID,text,messageType);
-      await FBCloudStore.instanace.updateUserChatListField(widget.selectedUserID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
-      await FBCloudStore.instanace.updateUserChatListField(widget.myID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
-      _getUnreadMSGCountThenSendMessage();
+
+       FBCloudStore.instanace.sendMessageToChatRoom(widget.chatID,widget.myID,widget.selectedUserID,text,messageType);
+       FBCloudStore.instanace.updateUserChatListField(widget.selectedUserID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
+       FBCloudStore.instanace.updateUserChatListField(widget.myID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
+      _msgTextController.clear();
     }catch(e){
       showAlertDialog(context,'Error user information to database');
-      _resetTextFieldAndLoading();
+
     }
   }
 
   Future<void> _getUnreadMSGCountThenSendMessage() async{
     try {
       int unReadMSGCount = await FBCloudStore.instanace.getUnreadMSGCount(widget.selectedUserID);
-      await NotificationController.instance.sendNotificationMessageToPeerUser(unReadMSGCount, messageType, _msgTextController.text, widget.myName, widget.chatID, widget.selectedUserToken,widget.myImageUrl);
+      await NotificationController.instance.sendNotificationMessageToPeerUser(unReadMSGCount, messageType, _msgTextController.text, mynameon, widget.chatID, widget.selectedUserToken,widget.myImageUrl);
     }catch(e) {
-      print(e.message);
+      //print(e.message);
     }
-    _resetTextFieldAndLoading();
+
   }
 
-  void _resetTextFieldAndLoading() {
-    FocusScope.of(context).requestFocus(FocusNode());
-    _msgTextController.text = '';
-  }
 
   Future deleteFile() async {
     await _firestore
@@ -681,4 +807,3 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
 
 
 }
-

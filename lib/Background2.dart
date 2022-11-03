@@ -40,3 +40,29 @@ class Background2 extends StatelessWidget {
     );
   }
 }
+class Background3 extends StatelessWidget {
+  final Widget child;
+  const Background3({
+    Key key,
+    this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      color: Colors.white,
+      height: size.height,
+      width: double.infinity,
+      // Here i can use size.width but use double.infinity because both work as a same
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+
+
+          child,
+        ],
+      ),
+    );
+  }
+}

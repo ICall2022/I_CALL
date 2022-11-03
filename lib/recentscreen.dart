@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:i_call/Editprofile.dart';
 import 'package:i_call/about.dart';
 import 'package:i_call/chatconatct.dart';
+import 'package:i_call/chatlist2.dart';
+import 'package:i_call/chatroom2.dart';
 import 'package:i_call/search.dart';
 import 'package:i_call/terms.dart';
 import 'package:i_call/contact.dart';
@@ -40,6 +42,7 @@ class _recentState extends State<recent> {
     NotificationController.instance.updateTokenToServer();
     getData();
     getContact();
+    userdetail();
 
   }
 
@@ -61,6 +64,15 @@ class _recentState extends State<recent> {
       });
 
   }
+  var nameuser;
+  var Imgurl;
+  userdetail() async {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(_userik.uid.toString()).get();
+    Map<String, dynamic> data = docSnapshot.data();
+    nameuser = data['name'];
+    Imgurl = data['userImageUrl'];
+  }
 
 
 
@@ -77,7 +89,7 @@ appBar: AppBar(
 
 
       Text('I CALL'),
-      Padding(
+    /*  Padding(
         padding:  EdgeInsets.only(left:140.0),
         child: GestureDetector(
           onTap: (){
@@ -99,6 +111,7 @@ appBar: AppBar(
         ),
       ),
 
+ */
     ],
   ),
   actions: [
@@ -141,7 +154,6 @@ appBar: AppBar(
                         children: [
                           Icon(Icons.person,color: Colors.pinkAccent,),
                           SizedBox(
-// sized box with width 10
                             width: 10,
                           ),
                           Text("Edit Profile")
@@ -243,7 +255,6 @@ appBar: AppBar(
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context)=> EditProfile())
                 );
-
               }
               else if(value == 1){
                 Navigator.of(context).push(
@@ -293,7 +304,7 @@ appBar: AppBar(
   centerTitle: true,
 ),
       body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('users').orderBy('createdAt', descending: true).snapshots(),
+          stream: FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('Mycontacts').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
             return Stack(
               children: [
@@ -307,11 +318,7 @@ appBar: AppBar(
                         return  StreamBuilder(
 
                           stream: FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(_userik.uid.toString())
-                              .collection('chatlist')
-                              .where('chatWith', isEqualTo: userData['userId'])
-
+                              .collection('users').doc(_userik.uid.toString()).collection('chatlist').where('chatWith', isEqualTo: userData['userId'])
                               .snapshots(),
 
 
@@ -395,7 +402,7 @@ appBar: AppBar(
         backgroundColor: Color(0xffFE67C4),
         splashColor: Colors.white,
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatList()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatList2()));
         },
       ),
 
@@ -412,11 +419,11 @@ appBar: AppBar(
 
       try {
         String chatID = makeChatId(_userik.uid.toString(), selectedUserID);
-        Navigator.push(
+     /*   Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    ChatRoom(
+                    ChatRoom2(
                         _userik.uid.toString(),
                         name.toString(),
                         Imgurl.toString(),
@@ -425,8 +432,9 @@ appBar: AppBar(
                         chatID,
                         selectedUserName,
                         selectedUserThumbnail,
-                        phonenumber
-                    )));
+                        phonenumber,
+                        first
+                    )));*/
       } catch (e) {
         print(e.message);
       }
@@ -447,7 +455,8 @@ appBar: AppBar(
 
         FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
           'name': _contacts[i].displayName.toString(),
-          'phone': _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),''),
+
+          'phone':  _contacts[i].phones.first.toString() != "" ? _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),'') : "null"
 
 
 

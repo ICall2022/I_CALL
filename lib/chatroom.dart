@@ -62,7 +62,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
           FBCloudStore.instanace.updateMyChatListValues(widget.myID,widget.chatID,false);
           break;
         case AppLifecycleState.detached:
-          // TODO: Handle this case.
+        // TODO: Handle this case.
           break;
       }
     });
@@ -70,7 +70,15 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
   bool status = false;
   int a=0;
   User _userik = FirebaseAuth.instance.currentUser;
+  var currentphone;
 
+  userdetail() async {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(_userik.uid.toString()).get();
+    Map<String, dynamic> data = docSnapshot.data();
+    currentphone = data['phone'];
+
+  }
   firsttime()async{
     final snap = await FirebaseFirestore.instance.
     collection('users')
@@ -80,57 +88,57 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
     if (snap['first'] == 0) {
 
 
-        FirebaseFirestore.instance.
-        collection('users')
-            .doc(_userik.uid.toString()).update({
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
 
-          "first" : 1
-        }
-        );
+        "first" : 1
+      }
+      );
     }
     if (snap['first'] == 1) {
 
 
-        FirebaseFirestore.instance.
-        collection('users')
-            .doc(_userik.uid.toString()).update({
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
 
-          "first" : 2
-        }
-        );
+        "first" : 2
+      }
+      );
 
 
 
     }
     if (snap['first'] == 2) {
-           setState(() {
-         a=1;
-              });
+      setState(() {
+        a=1;
+      });
 
     }
 
   }
   Future checkDocuement() async {
     final snapShot = await FirebaseFirestore.instance.
-         collection('chatroom')
+    collection('chatroom')
         .doc(widget.chatID) // varuId in your case
         .get();
 
-   if (snapShot['status'] == "save") {
-    print('Cannot Delete');
-    setState(() {
-      status=true;
-    });
+    if (snapShot['status'] == "save") {
+      print('Cannot Delete');
+      setState(() {
+        status=true;
+      });
 
 
-  }
-   else if(snapShot['status'] == "not"){
-     deleteFile();
-     setState(() {
-       status=false;
-     });
+    }
+    else if(snapShot['status'] == "not"){
+      deleteFile();
+      setState(() {
+        status=false;
+      });
 
-  }
+    }
 
   }
   bool emojiShowing = false;
@@ -197,11 +205,11 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
     await FirebaseFirestore.instance
         .collection('chatroom')
         .doc(widget.chatID).update(
-        {
-      "status": "not",
+      {
+        "status": "not",
 
 
-    },);
+      },);
 
 
 
@@ -210,11 +218,11 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
     await FirebaseFirestore.instance
         .collection('chatroom')
         .doc(widget.chatID).update(
-        {
-      "status": "save",
+      {
+        "status": "save",
 
 
-    },);
+      },);
 
 
 
@@ -227,7 +235,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
         sub=1;
       });
     }
-   else {
+    else {
       // Collection not exits
       return false;
     }
@@ -285,12 +293,12 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
             TextButton(
               child: const Text('Disable Chat',style: TextStyle(color: Colors.blue),),
               onPressed: () {
-               savechat();
+                savechat();
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber)));
-                },
+                        builder: (BuildContext context) => ChatRoom(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber)));
+              },
             ),
           ],
         );
@@ -318,12 +326,12 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                    width: 50,
-                    height: 50,
+                      width: 50,
+                      height: 50,
 
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.network(widget.selectedUserThumbnail))
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(widget.selectedUserThumbnail))
 
                   ),
                 ),
@@ -332,112 +340,112 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
               ],
             ),
             actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              width: 50,
-              height: 50,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: 50,
+                  height: 50,
 
-              decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.20),
-                  borderRadius: BorderRadius.circular(20)
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.20),
+                      borderRadius: BorderRadius.circular(20)
 
-              ),
-              child: PopupMenuButton<int>(
-              offset: Offset(0, 40),
-                color: Colors.white,
-                elevation: 2,
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-
-                  status == true?        PopupMenuItem(
-                    value: 1,
-                    onTap: (){
-
-                      Future.delayed(
-                          const Duration(seconds: 0),
-                              () => _showMyDialog2()
-
-                      );
-                    },
-
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.download_done_outlined,color: Colors.pinkAccent,),
-                            SizedBox(
-// sized box with width 10
-                              width: 10,
-                            ),
-                            Text("Chat is Saved")
-                          ],
-                        ),
-                        Divider(),
-                      ],
-                    ),
-                  ) : PopupMenuItem(
-                    onTap: (){
-                      Future.delayed(
-                          const Duration(seconds: 0),
-                              () => _showMyDialog1()
-
-                      );
-                    },
-                    value: 2,
-// row has two child icon and text
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.monitor_heart,color: Colors.pinkAccent,),
-                            SizedBox(
-// sized box with width 10
-                              width: 10,
-                            ),
-                            Text("Save Chat")
-                          ],
-                        ),
-                        Divider(),
-                      ],
-                    ),
                   ),
-                  PopupMenuItem(
-                    value: 3,
+                  child: PopupMenuButton<int>(
+                      offset: Offset(0, 40),
+                      color: Colors.white,
+                      elevation: 2,
+                      shape: ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
 
+                        status == true?        PopupMenuItem(
+                          value: 1,
+                          onTap: (){
 
+                            Future.delayed(
+                                const Duration(seconds: 0),
+                                    () => _showMyDialog2()
 
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Row(
+                            );
+                          },
+
+                          child: Column(
                             children: [
-                              Icon(Icons.person,color: Colors.pinkAccent,),
-                              SizedBox(
+                              Row(
+                                children: [
+                                  Icon(Icons.download_done_outlined,color: Colors.pinkAccent,),
+                                  SizedBox(
 // sized box with width 10
-                                width: 10,
+                                    width: 10,
+                                  ),
+                                  Text("Chat is Saved")
+                                ],
                               ),
-                              Text("View Contact")
+                              Divider(),
                             ],
                           ),
-                          Divider(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                onSelected: (value) {
+                        ) : PopupMenuItem(
+                          onTap: (){
+                            Future.delayed(
+                                const Duration(seconds: 0),
+                                    () => _showMyDialog1()
 
-                }),
-            ),
-          )
+                            );
+                          },
+                          value: 2,
+// row has two child icon and text
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.monitor_heart,color: Colors.pinkAccent,),
+                                  SizedBox(
+// sized box with width 10
+                                    width: 10,
+                                  ),
+                                  Text("Save Chat")
+                                ],
+                              ),
+                              Divider(),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 3,
+
+
+
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.person,color: Colors.pinkAccent,),
+                                    SizedBox(
+// sized box with width 10
+                                      width: 10,
+                                    ),
+                                    Text("View Contact")
+                                  ],
+                                ),
+                                Divider(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                      onSelected: (value) {
+
+                      }),
+                ),
+              )
             ],
             toolbarHeight: 67,
             flexibleSpace: Container(
@@ -464,11 +472,11 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
           ),
           body: StreamBuilder<QuerySnapshot> (
               stream: FirebaseFirestore.instance.
-                  collection('chatroom').
-                  doc(widget.chatID).
-                  collection(widget.chatID).
-                  orderBy('timestamp',descending: false).
-                  snapshots(),
+              collection('chatroom').
+              doc(widget.chatID).
+              collection(widget.chatID).
+              orderBy('timestamp',descending: false).
+              snapshots(),
               builder: (context,snapshot) {
                 if (!snapshot.hasData) return LinearProgressIndicator();
                 return Stack(
@@ -479,11 +487,11 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
 
                         Expanded(
                           child: ListView(
-                            reverse: true,
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.fromLTRB(4.0,10,4,10),
-                            controller: _chatListController,
-                            children: addInstructionInSnapshot(snapshot.data.docs).map(_returnChatWidget).toList()
+                              reverse: true,
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.fromLTRB(4.0,10,4,10),
+                              controller: _chatListController,
+                              children: addInstructionInSnapshot(snapshot.data.docs).map(_returnChatWidget).toList()
                           ),
                         ),
                         _buildTextComposer(),
@@ -493,8 +501,8 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
                   ],
                 );
               }
-            ),
           ),
+        ),
       ),
     );
     // );
@@ -538,78 +546,78 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
           children: [
             new Container(
               height: 67,
-             width: 366,
-             decoration: BoxDecoration(
-               borderRadius: BorderRadius.circular(25),
-               color: Color(0xffF8E6EE)
-             ),
+              width: 366,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  color: Color(0xffF8E6EE)
+              ),
               child: new Row(
-                children: <Widget>[
-                  new Container(
-                    margin: new EdgeInsets.symmetric(horizontal: 2.0),
-                    child: new IconButton(
-                        icon: new Icon(Icons.emoji_emotions_outlined,color: Color(0xffFC1982),),
-                        onPressed: () {
-                          setState(() {
-                            emojiShowing = !emojiShowing;
-                          });
-
-
-                        }),
-                  ),
-                  new Flexible(
-                    child: new TextField(
-                      controller: _msgTextController,
-                      onSubmitted: _handleSubmitted,
-                      decoration: new InputDecoration.collapsed(
-                          hintText: "Send a message"),
-                    ),
-                  ),
-                  RotationTransition(
-                    turns: AlwaysStoppedAnimation(30 / 360),
-                    child: new Container(
-
-
+                  children: <Widget>[
+                    new Container(
                       margin: new EdgeInsets.symmetric(horizontal: 2.0),
                       child: new IconButton(
-
-                          icon: new Icon(Icons.attach_file_rounded,color: Color(0xffFC1982),),
+                          icon: new Icon(Icons.emoji_emotions_outlined,color: Color(0xffFC1982),),
                           onPressed: () {
+                            setState(() {
+                              emojiShowing = !emojiShowing;
+                            });
 
-                            ImageController.instance.cropImageFromFile().then((croppedFile) {
-                              if (croppedFile != null) {
-                                setState(() { messageType = 'image'; });
-                                _saveUserImageToFirebaseStorage(croppedFile);
-                              }else {
-                                showAlertDialog(context,'Pick Image error');
-                              }
-                            }
-                            );
 
                           }),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top:8.0,bottom: 8,right: 8,left: 1),
-                    child: new Container(
-                      height: 52,
-                      width: 52,
-                      decoration: BoxDecoration(
+                    new Flexible(
+                      child: new TextField(
+                        controller: _msgTextController,
+                        onSubmitted: _handleSubmitted,
+                        decoration: new InputDecoration.collapsed(
+                            hintText: "Send a message"),
+                      ),
+                    ),
+                    RotationTransition(
+                      turns: AlwaysStoppedAnimation(30 / 360),
+                      child: new Container(
+
+
+                        margin: new EdgeInsets.symmetric(horizontal: 2.0),
+                        child: new IconButton(
+
+                            icon: new Icon(Icons.attach_file_rounded,color: Color(0xffFC1982),),
+                            onPressed: () {
+
+                              ImageController.instance.cropImageFromFile().then((croppedFile) {
+                                if (croppedFile != null) {
+                                  setState(() { messageType = 'image'; });
+                                  _saveUserImageToFirebaseStorage(croppedFile);
+                                }else {
+                                  showAlertDialog(context,'Pick Image error');
+                                }
+                              }
+                              );
+
+                            }),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top:8.0,bottom: 8,right: 8,left: 1),
+                      child: new Container(
+                        height: 52,
+                        width: 52,
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
                           color: Color(0xffFC1982),
-                      ),
-                      margin: new EdgeInsets.symmetric(horizontal: 2.0),
-                      child: GestureDetector(
-                        onTap: (){
-                           setState(() { messageType = 'text'; });
-                                 _handleSubmitted(_msgTextController.text);
-                               },
+                        ),
+                        margin: new EdgeInsets.symmetric(horizontal: 2.0),
+                        child: GestureDetector(
+                          onTap: (){
+                            setState(() { messageType = 'text'; });
+                            _handleSubmitted(_msgTextController.text);
+                          },
 
-                        child:  Image.asset("assets/send.png"),
+                          child:  Image.asset("assets/send.png"),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                ]
+                  ]
               ),
             ),
 
@@ -702,25 +710,25 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
   Future deleteFile() async {
     await _firestore
         .collection('chatroom').
-         doc(widget.chatID).
-         collection(widget.chatID).
-         where('timestamp',isLessThanOrEqualTo:timestamp.millisecondsSinceEpoch).get().
-       then((value) => value.docs.forEach((doc) {
-          doc.reference.delete();
+    doc(widget.chatID).
+    collection(widget.chatID).
+    where('timestamp',isLessThanOrEqualTo:timestamp.millisecondsSinceEpoch).get().
+    then((value) => value.docs.forEach((doc) {
+      doc.reference.delete();
     }));
 
   }
   Future update() async {
     await _firestore
         .collection('chatroom').
-         doc(widget.chatID).
-         collection(widget.chatID).
+    doc(widget.chatID).
+    collection(widget.chatID).
     doc("Status").set(
 
-      {
-        'save' : "true"
+        {
+          'save' : "true"
 
-      }
+        }
     );
 
 
@@ -730,14 +738,14 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver,LocalNo
   Future update1() async {
     await _firestore
         .collection('chatroom').
-         doc(widget.chatID).
-         collection(widget.chatID).
-         doc("Status").update(
+    doc(widget.chatID).
+    collection(widget.chatID).
+    doc("Status").update(
 
-      {
-        'save' : "false"
+        {
+          'save' : "false"
 
-      }
+        }
     );
 
 

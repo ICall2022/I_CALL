@@ -1,16 +1,20 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/Welcome.dart';
 import 'package:i_call/login.dart';
+import 'package:i_call/recent2.dart';
 import 'package:i_call/recentscreen.dart';
 import 'package:i_call/subWidgets/common_widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'Controllers/fb_auth.dart';
@@ -69,7 +73,7 @@ class MyApp extends StatelessWidget {
       ),
       home: FirebaseAuth.instance.currentUser == null ?
 
-      WelcomeScreen() :recent(),
+      WelcomeScreen() : splashscreen(),
     );
   }
 }
@@ -87,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   File _userImageFile = File('');
   String _userImageUrlFromFB = '';
 
-  bool _isLoading = true;
+  bool _isLoading = false;
   User _user;
   String _userId;
 
@@ -109,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _takeUserInformationFromFBDB(user);
       }else{
         setState(() {
-          _isLoading = false;
+
         });
       }
     });
@@ -424,100 +428,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-               /*   Padding(
-                    padding: const EdgeInsets.only(left: 18.0, top: 10),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Your Information.',
-                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.all(8),
-                          child: GestureDetector(
-                              onTap: () {
-                                ImageController.instance.cropImageFromFile().then((croppedFile) {
-                                  if (croppedFile != null) {
-                                    setState(() {
-                                      _userImageFile = croppedFile;
-                                      _userImageUrlFromFB = '';
-                                    });
-                                  } else {
-                                    showAlertDialog(context,'Pick Image error');
-                                  }
-                                });
-                              },
-                              child: Container(
-                                width: 140,
-                                height: 160,
-                                child: Card(
-                                  child: _userImageUrlFromFB != ''
-                                      ? Image.network(_userImageUrlFromFB)
-                                      : (_userImageFile.path != '')
-                                      ? Image.file(_userImageFile,
-                                      fit: BoxFit.fill)
-                                      : Icon(Icons.add_photo_alternate,
-                                      size: 60, color: Colors.grey[700]),
-                                ),
-                              ))),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            TextFormField(
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
 
-                                  labelText: 'Email',
-                                  hintText: 'Type Email'),
-                              controller: _emailTextController,
-                            ),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  icon: Icon(Icons.account_circle),
-                                  labelText: 'Name',
-                                  hintText: 'Type Name'),
-                              controller: _nameTextController,
-                            ),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  icon: Icon(Icons.note),
-                                  labelText: 'Intro',
-                                  hintText: 'Type Intro'),
-                              controller: _introTextController,
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0, 10, 20, 10),
-                      child: MaterialButton(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text('Go to Chat list', style: TextStyle(fontSize: 28),)
-                          ],
-                        ),
-                        textColor: Colors.white,
-                        color: Colors.green[700],
-                        padding: EdgeInsets.all(10),
-                        onPressed: () => _checkUserStatus(),
-                      )),*/
 
                 ],
               ),
             ),
           ),
-          // youtubePromotion(),
-
+          loadingCircle(_isLoading),
         ],
       ),
 
@@ -528,8 +445,8 @@ class _MyHomePageState extends State<MyHomePage> {
     String alertString = checkValidUserData(_nameTextController.text, _introTextController.text);
     if (alertString.trim() != '') {
       showAlertDialog(context,alertString);
-    } else {
-
+    }
+    else {
 
       }
       _updateFBdata();
@@ -658,6 +575,153 @@ class _TestState extends State<Test> {
         ),
       ),
     );
+  }
+}
+class splashscreen extends StatefulWidget {
+  const splashscreen({Key  key}) : super(key: key);
+
+  @override
+  _splashscreenState createState() => _splashscreenState();
+}
+class _splashscreenState extends State<splashscreen> {
+
+  void initState() {
+
+    super.initState();
+    firsttime();
+    getContact();
+    userdetail();
+    newuser();
+    Timer(Duration(seconds: 3),
+
+            ()=>Navigator.pushReplacement(context,
+            MaterialPageRoute(builder:
+                (context) =>   recent2(first,nameuser,Imgurl,chatno),
+            )
+        )
+    );
+  }
+  User _userik = FirebaseAuth.instance.currentUser;
+  firsttime()async{
+    final snap = await FirebaseFirestore.instance.
+    collection('users')
+        .doc(_userik.uid.toString()) // varuId in your case
+        .get();
+
+    if (snap['first'] == 0) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 1
+      }
+      );
+    }
+    if (snap['first'] == 1) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 2
+      }
+      );
+
+
+
+    }
+    if (snap['first'] == 2) {
+      setState(() {
+        first = 2;
+      });
+
+    }
+
+  }
+  int chatno = 1;
+  newuser()  async {
+
+    final result =  await FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('chatlist').limit(1).get();
+    if (result.size == 0) {
+      setState(() {
+        chatno = 2;
+
+      });
+
+    }
+  }
+  int first =0;
+  @override
+  Widget build(BuildContext context) {
+
+    final data = MediaQuery.of(context);
+    return   Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(children: [
+
+          Padding(
+            padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height *0.32),
+            child: Center(
+              child: Container(
+                width: 170,
+                height:170,
+                child: Image.asset("assets/icalllogo.png",fit: BoxFit.contain,),
+              ),
+            ),
+          ),
+          SizedBox(height: 5,),
+
+
+          Center(child: Text("Enjoy your time",style: GoogleFonts.kaushanScript(fontSize: 25),)),
+          SizedBox(height: 30,),
+          CircularProgressIndicator()
+        ],
+        ),
+      ),
+    );
+
+  }
+  int i;
+  var nameuser;
+  var Imgurl;
+  void getContact() async {
+
+    try {
+      await Permission.contacts.request();
+      final sw = Stopwatch()
+        ..start();
+      final contacts = await FastContacts.allContacts;
+      sw.stop();
+      _contacts = contacts;
+
+      for (i = 0; i < _contacts.length; i++) {
+
+        FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
+          'name': _contacts[i].displayName.toString(),
+
+          'phone':  _contacts[i].phones.first.toString() != "" ? _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),'') : "null"
+
+
+
+        });
+
+      }
+    }
+    on PlatformException {
+
+    }
+  }
+  List<Contact> _contacts = const [];
+  userdetail() async {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(_userik.uid.toString()).get();
+    Map<String, dynamic> data = docSnapshot.data();
+    nameuser = data['name'];
+    Imgurl = data['userImageUrl'];
   }
 }
 

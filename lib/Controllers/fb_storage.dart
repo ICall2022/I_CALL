@@ -53,9 +53,7 @@ class FBStorage{
         // e.g, e.code == 'canceled'
       }
 
-      return await firebase_storage.FirebaseStorage.instance
-          .ref(filePath)
-          .getDownloadURL();
+      return await firebase_storage.FirebaseStorage.instance.ref(filePath).getDownloadURL();
     }catch(e) {
       print(e.message);
     }

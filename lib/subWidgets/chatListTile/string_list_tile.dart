@@ -11,21 +11,7 @@ Widget stringListTile(String data){
   if(data == chatInstruction){
     _returnWidget = Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-              color:Color(0xffF8E6EE),
-              borderRadius: BorderRadius.all(
-                  Radius.circular(25.0)
-              )
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(data),
-          ),
-        ),
-      ),
+      child: Text("")
     );
   }else{
     _returnWidget = Padding(
