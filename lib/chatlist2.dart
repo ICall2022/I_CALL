@@ -1,6 +1,10 @@
 
 
+import 'dart:typed_data';
+
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:i_call/chatroom2.dart';
 
@@ -9,6 +13,8 @@ import 'package:i_call/chatroom2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 import 'Controllers/fb_messaging.dart';
@@ -20,9 +26,10 @@ import 'Controllers/utils.dart';
 import 'subWidgets/local_notification_view.dart';
 
 class ChatList2 extends StatefulWidget {
-  const ChatList2({Key key}) : super(key: key);
 
 
+  List<Contact> contacts = const [];
+  ChatList2(this.contacts);
 
   @override _ChatList createState() => _ChatList();
 }
@@ -33,7 +40,8 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
   void initState() {
     firsttime();
     userdetail();
-    Mycontacts();
+
+
     super.initState();
     NotificationController.instance.updateTokenToServer();
 
@@ -104,14 +112,17 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
   }
   var nameuser;
   var Imgurl;
+  String myphone;
   userdetail() async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
      nameuser = data['name'];
      Imgurl = data['userImageUrl'];
+     myphone = data['phone'];
   }
   String name = "";
+
 
 
   @override
@@ -131,9 +142,9 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
 
 
 
-              const   Text('Select a contact'),
+              const   Text('Your contacts on I CALL',style: TextStyle(fontSize: 17),),
               Padding(
-                padding:  EdgeInsets.only(left:70.0),
+                padding:  EdgeInsets.only(left:30.0),
                 child: GestureDetector(
                   onTap: (){
                     setState(() {
@@ -223,138 +234,193 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
         ),
         body:  RefreshIndicator(
             onRefresh: (){
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatList2()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  ChatList2(widget.contacts)));
 
             },
-            child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('users').snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
-                  if(userSnapshot.hasData  ) {
-                    return ListView(
-                        shrinkWrap: true,
-                        children: userSnapshot.data.docs.map((userData1) {
-                          return StreamBuilder(
-                              stream: (name != "" && name != null)
-                                  ? FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection("contacts")
-                                  .where('name', isGreaterThanOrEqualTo: name).where('name', isLessThan: name + 'z').snapshots()
-                                  : FirebaseFirestore.instance.collection('users')
-                                  .doc(_userik.uid.toString())
-                                  .collection("contacts")
-                                  .snapshots(),
-                              builder: (context, AsyncSnapshot<
-                                  QuerySnapshot> snapshots) {
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  StreamBuilder(
+                          stream: FirebaseFirestore.instance.collection('users').snapshots(),
+                          builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
+                            if(userSnapshot.hasData  ) {
+                              return ListView(
+                                  shrinkWrap: true,
+                                  children: userSnapshot.data.docs.map((userData1) {
+                                    return StreamBuilder(
+                                        stream: (name != "" && name != null)
+                                            ? FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection("contacts")
+                                            .where('name', isGreaterThanOrEqualTo: name).where('name', isLessThan: name + 'z').snapshots()
+                                            : FirebaseFirestore.instance.collection('users')
+                                            .doc(_userik.uid.toString())
+                                            .collection("contacts")
+                                            .snapshots(),
+                                        builder: (context, AsyncSnapshot<
+                                            QuerySnapshot> snapshots) {
 
 
-                                  return ListView(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      children: snapshots.data.docs.map((
-                                          userData) {
-                                        if (userData['phone'].toString().length >= 10) {
-                                          return userData1['phone'].contains(userData['phone'].toString().substring(2)) ? Padding(
-                                            padding: const EdgeInsets.all(
-                                                8.0),
-                                            child: ListTile(
+                                            return ListView(
+                                                shrinkWrap: true,
+                                                physics: NeverScrollableScrollPhysics(),
+                                                children: snapshots.data.docs.map((
+                                                    userData) {
+                                                  if (userData['phone'].toString().length >= 10) {
+                                                    return userData1['phone'].contains(userData['phone'].toString().substring(2)) ? Padding(
+                                                      padding: const EdgeInsets.all(
+                                                          8.0),
+                                                      child: ListTile(
 
-                                                leading: ClipRRect(
-                                                  borderRadius: BorderRadius
-                                                      .circular(15),
-                                                  child: ImageController
-                                                      .instance.cachedImage(
-                                                      userData1['userImageUrl']),
-                                                ),
-                                                title: Text(userData['name'],
-                                                  style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight
-                                                          .bold),),
+                                                          leading: ClipRRect(
+                                                            borderRadius: BorderRadius
+                                                                .circular(15),
+                                                            child: ImageController
+                                                                .instance.cachedImage(
+                                                                userData1['userImageUrl']),
+                                                          ),
+                                                          title: Text(userData['name'],
+                                                            style: const TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight: FontWeight
+                                                                    .bold),),
 
 
-                                                onTap: () {
-                                                  print(
-                                                      "name ${userData['name']}");
-                                                  String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (
-                                                              context) =>
-                                                              ChatRoom2(
-                                                                  _userik.uid.toString(),
-                                                                  name.toString(),
-                                                                  Imgurl.toString(),
-                                                                  userData1['FCMToken'],
-                                                                  userData1['userId'],
-                                                                  chatID,
-                                                                  userData['name'],
-                                                                  userData1['userImageUrl'],
-                                                                  userData1['phone'],
-                                                                   first
-                                                              )));
-                                                }),
-                                          ) : const SizedBox();
+                                                          onTap: () {
+                                                            print(
+                                                                "name ${userData['name']}");
+                                                            String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (
+                                                                        context) =>
+                                                                        ChatRoom2(
+                                                                            _userik.uid.toString(),
+                                                                            name.toString(),
+                                                                            Imgurl.toString(),
+                                                                            userData1['FCMToken'],
+                                                                            userData1['userId'],
+                                                                            chatID,
+                                                                            userData['name'],
+                                                                            userData1['userImageUrl'],
+                                                                            userData1['phone'],
+                                                                          "",
+                                                                            null,
+                                                                          myphone
+
+                                                                        )));
+                                                          }),
+                                                    ) : const SizedBox();
+                                                  }
+                                                  else {
+                                                    return userData1['phone'].contains(
+                                                        userData['phone'].toString())
+                                                        ? Padding(
+                                                      padding: const EdgeInsets.all(
+                                                          8.0),
+                                                      child: ListTile(
+                                                        leading: ClipRRect(
+                                                          borderRadius: BorderRadius
+                                                              .circular(15),
+                                                          child: ImageController
+                                                              .instance
+                                                              .cachedImage(
+                                                              userData1['userImageUrl']),
+                                                        ),
+                                                        title: Text(userData['name'],
+                                                          style:const TextStyle(fontSize: 20,
+                                                              fontWeight: FontWeight
+                                                                  .bold),),
+
+
+                                                        onTap: () {
+                                                         // print("name ${userData['name']}");
+                                                          String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      ChatRoom2(
+                                                                          _userik.uid.toString(),
+                                                                          name.toString(),
+                                                                          Imgurl.toString(),
+                                                                          userData1['FCMToken'],
+                                                                          userData1['userId'],
+                                                                          chatID,
+                                                                          userData['name'],
+                                                                          userData1['userImageUrl'],
+                                                                          userData1['phone'],
+                                                                        "",null,
+                                                                        myphone
+                                                                          )));
+                                                        },
+                                                      ),
+                                                    )
+                                                        : SizedBox();
+                                                  }
+                                                }).toList()
+                                            );
+
                                         }
-                                        else {
-                                          return userData1['phone'].contains(
-                                              userData['phone'].toString())
-                                              ? Padding(
-                                            padding: const EdgeInsets.all(
-                                                8.0),
-                                            child: ListTile(
-                                              leading: ClipRRect(
-                                                borderRadius: BorderRadius
-                                                    .circular(15),
-                                                child: ImageController
-                                                    .instance
-                                                    .cachedImage(
-                                                    userData1['userImageUrl']),
-                                              ),
-                                              title: Text(userData['name'],
-                                                style:const TextStyle(fontSize: 20,
-                                                    fontWeight: FontWeight
-                                                        .bold),),
+                                    );
+                                  }).toList()
 
+                              );
+                            }
+                         return const Scaffold(
+                              body: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                          ),
+                  Container(
+                      width: 200,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color:Color(0xffF8E6EE),
+                        borderRadius: BorderRadius.circular(12)
+                      ),
+                      child: Center(child: Text("Invite others to I CALL",style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600
+                      ),))),
+                  ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: widget.contacts.length,
+                    itemBuilder: (BuildContext context, int index) {
 
-                                              onTap: () {
-                                               // print("name ${userData['name']}");
-                                                String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChatRoom2(
-                                                                _userik.uid.toString(),
-                                                                name.toString(),
-                                                                Imgurl.toString(),
-                                                                userData1['FCMToken'],
-                                                                userData1['userId'],
-                                                                chatID,
-                                                                userData['name'],
-                                                                userData1['userImageUrl'],
-                                                                userData1['phone'],
-                                                                first)));
-                                              },
-                                            ),
-                                          )
-                                              : SizedBox();
-                                        }
-                                      }).toList()
-                                  );
+                      String num =  (widget.contacts[index].phones.first) ;
+                      return ListTile(
+                          leading: const CircleAvatar(
+                              backgroundColor: Color(0xffF84F9D),
+                              child: Icon(Icons.person)),
+                          title: Text(
+                              "${widget.contacts[index].displayName}"),
+                          subtitle: Text(num),
+                          onTap: () async{
+                            if (widget.contacts[index].phones.isNotEmpty) {
 
+                              var url = Uri.parse("sms:${widget.contacts[index].phones}?body= Kindly download I CALL to enjoy and improve our chating");
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                throw 'Could not launch $url';
                               }
-                          );
-                        }).toList()
 
-                    );
-                  }
-               return const Scaffold(
-                    body: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                ),
-            )
+                            }
+                          });
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+
+
+            ),
+
     );
   }
 
@@ -388,140 +454,7 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
 
 
 
-  Mycontacts() async {
-    int i;
-    var document = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
-    var docu = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
-    var allusers = await  FirebaseFirestore.instance.collection("users").get();
 
-    if(first!=2){
-      for (i = 0; i < document.docs.length; i++) {
-        if (document.docs[i]['phone']
-            .toString()
-            .length >= 10) {
-          for (int j = 0; j < allusers.docs.length; j++) {
-            allusers.docs[j]['phone'].contains(
-                document.docs[i]['phone'].toString().substring(2)) ?
-            FirebaseFirestore.instance.collection("users").doc(
-                _userik.uid.toString()).collection('Mycontacts').doc(
-                allusers.docs[j]['userId']).set({
-              'name': document.docs[i]['name'].toString(),
-              'userId': allusers.docs[j]['userId'],
-              'FCMToken': allusers.docs[j]['FCMToken'],
-              'userImageUrl': allusers.docs[j]['userImageUrl'],
-              'phone': allusers.docs[j]['phone'],
-              'userId': allusers.docs[j]['userId'],
-
-
-            }) : null;
-          }
-        }
-        else {
-          for (int j = 0; j < allusers.docs.length; j++) {
-            allusers.docs[j]['phone'].contains(
-                document.docs[i]['phone'].toString()) ?
-            FirebaseFirestore.instance.collection("users").doc(
-                _userik.uid.toString()).collection('Mycontacts').doc(
-                allusers.docs[j]['userId']).set(
-                {
-                  'name': document.docs[i]['name'].toString(),
-                  'userId': allusers.docs[j]['userId'],
-                  'FCMToken': allusers.docs[j]['FCMToken'],
-                  'userImageUrl': allusers.docs[j]['userImageUrl'],
-                  'phone': allusers.docs[j]['phone'],
-                  'userId': allusers.docs[j]['userId'],
-                })
-
-                : null;
-          }
-        }
-      }
-
-    }
-
-    else {
-      for (i = 0; i < document.docs.length; i++) {
-        if (document.docs[i]['phone'].toString().length >= 10) {
-          for (int j = 0; j < allusers.docs.length; j++) {
-
-            final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('Mycontacts').doc(allusers.docs[j]['userId']).get();
-            if(docSnapshot.exists) {
-              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString().substring(2)) ?
-              FirebaseFirestore.instance.collection("users").doc(
-                  _userik.uid.toString()).collection('Mycontacts').doc(
-                  allusers.docs[j]['userId']).update({
-                'name': document.docs[i]['name'].toString(),
-                'userId': allusers.docs[j]['userId'],
-                'FCMToken': allusers.docs[j]['FCMToken'],
-                'userImageUrl': allusers.docs[j]['userImageUrl'],
-                'phone': allusers.docs[j]['phone'],
-                'userId': allusers.docs[j]['userId'],
-
-
-              }) : null;
-            }
-            else {
-              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString().substring(2)) ?
-              FirebaseFirestore.instance.collection("users").doc(
-                  _userik.uid.toString()).collection('Mycontacts').doc(
-                  allusers.docs[j]['userId']).set({
-                'name': document.docs[i]['name'].toString(),
-                'userId': allusers.docs[j]['userId'],
-                'FCMToken': allusers.docs[j]['FCMToken'],
-                'userImageUrl': allusers.docs[j]['userImageUrl'],
-                'phone': allusers.docs[j]['phone'],
-                'userId': allusers.docs[j]['userId'],
-
-
-              }) : null;
-
-            }
-
-          }
-        }
-        else {
-          for (int j = 0; j < allusers.docs.length; j++) {
-            final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('Mycontacts').doc(allusers.docs[j]['userId']).get();
-            if(docSnapshot.exists) {
-              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString()) ?
-              FirebaseFirestore.instance.collection("users").doc(
-                  _userik.uid.toString()).collection('Mycontacts').doc(
-                  allusers.docs[j]['userId']).update(
-                  {
-                    'name': document.docs[i]['name'].toString(),
-                    'userId': allusers.docs[j]['userId'],
-                    'FCMToken': allusers.docs[j]['FCMToken'],
-                    'userImageUrl': allusers.docs[j]['userImageUrl'],
-                    'phone': allusers.docs[j]['phone'],
-                    'userId': allusers.docs[j]['userId'],
-                  })
-
-                  : null;
-            }
-            else {
-              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString()) ?
-              FirebaseFirestore.instance.collection("users").doc(
-                  _userik.uid.toString()).collection('Mycontacts').doc(
-                  allusers.docs[j]['userId']).set(
-                  {
-                    'name': document.docs[i]['name'].toString(),
-                    'userId': allusers.docs[j]['userId'],
-                    'FCMToken': allusers.docs[j]['FCMToken'],
-                    'userImageUrl': allusers.docs[j]['userImageUrl'],
-                    'phone': allusers.docs[j]['phone'],
-                    'userId': allusers.docs[j]['userId'],
-                  })
-
-                  : null;
-
-            }
-
-          }
-        }
-      }
-    }
-
-  }
 
 
 }

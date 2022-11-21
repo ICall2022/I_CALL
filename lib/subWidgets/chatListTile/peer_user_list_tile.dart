@@ -61,7 +61,7 @@ Widget peerUserListTile(BuildContext context, String name, String thumbnail, Str
 
                                 child: type == 'text' ? Text(message,
                                   style: TextStyle(color: Colors.black),) :
-                                imageMessage(context,message)
+                                imageMessage(context,message,name)
                             ),
                           ),
                         ),

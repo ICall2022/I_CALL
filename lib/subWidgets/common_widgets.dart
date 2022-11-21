@@ -20,36 +20,67 @@ Widget loadingCircle(bool value,){
 
 Widget loadingCircleForFB(){
   return Container(
-    child: Center(
-      child: CircularProgressIndicator(),
-    ),
-    color: Colors.white.withOpacity(0.7),
+ width: 200,
+      height: 200,
+      child: Lottie.asset("assets/Loading2.json"),
+  color: Colors.white.withOpacity(0.7),
   );
 }
 
-Widget imageMessage(context,imageUrlFromFB) {
+Widget imageMessage(context,imageUrlFromFB,username) {
   return Container(
-    width: 160,
-    height: 160,
+    width: 170,
+    height: 170,
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
+      gradient:  LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            Color(0xffF39EC4),
+            Color(0xffF39EC4)
+          ]),
+      borderRadius: BorderRadius.circular(15.0),
     ),
-    child: GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => FullPhoto(url: imageUrlFromFB)));
-      },
-      child: CachedNetworkImage(
-        imageUrl: imageUrlFromFB,
-        placeholder: (context, url) => Container(
-          transform: Matrix4.translationValues(0, 0, 0),
-          child: Container( width: 60, height: 80,
-              child: Center(child: new CircularProgressIndicator())),
+    child: Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        width: 160,
+        height: 160,
+        decoration: BoxDecoration(
+          gradient:  LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: <Color>[
+                Color(0xffF39EC4),
+                Color(0xffF39EC4)
+              ]),
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        errorWidget: (context, url, error) => new Icon(Icons.error),
-        width: 60,
-        height: 80,
-        fit: BoxFit.cover,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => FullPhoto(url: imageUrlFromFB,selectedUserName: username,)));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: CachedNetworkImage(
+              imageUrl: imageUrlFromFB,
+              placeholder: (context, url) => Container(
+                transform: Matrix4.translationValues(0, 0, 0),
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  child: Lottie.asset("assets/Loading2.json"),
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ),
+              errorWidget: (context, url, error) => new Icon(Icons.error),
+              width: 60,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
     ),
   );

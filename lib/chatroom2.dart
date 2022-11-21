@@ -7,6 +7,8 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:i_call/viewprofile.dart';
+import 'package:lottie/lottie.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Controllers/fb_firestore.dart';
@@ -22,7 +24,7 @@ import 'subWidgets/local_notification_view.dart';
 
 
 class ChatRoom2 extends StatefulWidget {
-  ChatRoom2(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail,this.phonenumber,this.first ,{Key key}) : super(key: key);
+  ChatRoom2(this.myID,this.myName,this.myImageUrl,this.selectedUserToken, this.selectedUserID, this.chatID, this.selectedUserName, this.selectedUserThumbnail,this.phonenumber,this.message,this.fileimg,this.myphone,{Key key}) : super(key: key);
 
   String myID;
   String myName;
@@ -33,7 +35,10 @@ class ChatRoom2 extends StatefulWidget {
   String selectedUserName;
   String selectedUserThumbnail;
   String phonenumber;
-  int first;
+  String message;
+  String myphone;
+  List<SharedMediaFile> fileimg;
+
 
   @override _ChatRoom2State createState() => _ChatRoom2State();
 }
@@ -45,7 +50,8 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
    ScrollController _chatListController = ScrollController();
   String messageType = 'text';
   int chatListLength = 20;
-
+  var date = new DateTime.now();
+  bool _isLoading = false;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
      // //print('didChangeAppLifecycleState');
@@ -158,6 +164,21 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
 
   @override
   void initState() {
+    setState(() {
+      widget.message !=""?
+      _msgTextController.text = widget.message: null;
+    });
+    widget.fileimg != null?
+    ImageController3.instance.cropImageFromFile2(widget.fileimg).then((croppedFile) {
+      if (croppedFile != null) {
+        setState(() { messageType = 'image'; });
+        _saveUserImageToFirebaseStorage(croppedFile);
+      }else {
+
+      }
+    }
+    ): null;
+    print("NMAEEEEEEE:${widget.fileimg.toString()}");
     myname();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -255,8 +276,13 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
           title:  const Text('Do you want to save this chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text('This action will save your chat here after' ),
+              children:  <Widget>[
+                Container(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset("assets/Savechat.json")
+                ),
+                Text('This action will save your chat here after'),
 
               ],
             ),
@@ -270,7 +296,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.first)));
+                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.message,widget.fileimg,widget.myphone)));
               },
             ),
           ],
@@ -287,7 +313,12 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
           title:  const Text('Are you sure of disabling the save chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
+              children:  <Widget>[
+                Container(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset("assets/AREYOUSURE.json")
+                ),
                 Text('This action will delete all your chat happened in past' ),
 
               ],
@@ -302,7 +333,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute<void>(
-                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.first)));
+                        builder: (BuildContext context) => ChatRoom2(widget.myID, widget.myName, widget.myImageUrl, widget.selectedUserToken, widget.selectedUserID, widget.chatID, widget.selectedUserName, widget.selectedUserThumbnail,widget.phonenumber,widget.message,widget.fileimg,widget.myphone)));
               },
             ),
           ],
@@ -511,26 +542,9 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                 return Stack(
                   children: <Widget>[
                     Column(
-                      children: <Widget>[
-                        widget.first == 0 ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                decoration:const BoxDecoration(
-                color:Color(0xffF8E6EE),
-                borderRadius: BorderRadius.all(
-                Radius.circular(25.0)
-                )
-                ),
-                child:const Padding(
-                padding:  EdgeInsets.all(16.0),
-                child: Text("""Hello Welcome to join with  
-I call App team. 
 
-This app's unique feature is "auto delete" feature. All your messages and media files will be deleted automatically within 2 days. You will feel good once you see your emptied space in your mobile phone. If you want to save there is save button which has to be touched by you and the same will be saved. Enjoy your time which is precious!"""
-                  ,textAlign: TextAlign.center,),
-                ),
-                ),
-                ) : Container(),
+                      children: <Widget>[
+
 
                         Expanded(
                           child: ListView(
@@ -541,6 +555,40 @@ This app's unique feature is "auto delete" feature. All your messages and media 
                               children: addInstructionInSnapshot(snapshot.data.docs).map(_returnChatWidget).toList()
                           ),
                         ),
+                        _isLoading == true ?  Padding(
+                          padding: const EdgeInsets.only(left: 170.0,right: 10),
+                          child: Container(
+                            width: 170,
+                            height: 170,
+                            decoration: BoxDecoration(
+                              gradient:  LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: <Color>[
+                                    Color(0xffF39EC4),
+                                    Color(0xffF39EC4)
+                                  ]),
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Container(
+                                  width: 160,
+                                  height: 160,
+                                  decoration: BoxDecoration(
+                                    gradient:  LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: <Color>[
+                                          Color(0xffF39EC4),
+                                          Color(0xffF39EC4)
+                                        ]),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: loadingCircle(true)),
+                            ),
+                          ),
+                        ) : Container(),
                         _buildTextComposer(),
                       ],
                     ),
@@ -634,7 +682,10 @@ This app's unique feature is "auto delete" feature. All your messages and media 
 
                               ImageController2.instance.cropImageFromFile().then((croppedFile) {
                                 if (croppedFile != null) {
-                                  setState(() { messageType = 'image'; });
+                                  setState(() {
+                                    messageType = 'image';
+                                   _isLoading=true;
+                                  });
                                   _saveUserImageToFirebaseStorage(croppedFile);
                                 }else {
 
@@ -661,7 +712,23 @@ This app's unique feature is "auto delete" feature. All your messages and media 
                             setState(() { messageType = 'text'; });
 
                             _handleSubmitted(_msgTextController.text);
+                            Updaterecent();
+                            FirebaseFirestore.instance
+                                .collection('chatroom')
+                                .doc(widget.chatID)
+                                .collection(widget.chatID)
+                                .doc(DateTime.now().millisecondsSinceEpoch.toString()).set({
+                              'idFrom': _userik.uid,
+                              'idTo': widget.selectedUserID,
+                              'timestamp': DateTime.now().millisecondsSinceEpoch,
+                              'content': _msgTextController.text,
+                              'type':messageType,
+                              'isread':false,
+                              'time': date.hour,
+
+                            });
                             _getUnreadMSGCountThenSendMessage();
+
 
 
 
@@ -736,12 +803,16 @@ This app's unique feature is "auto delete" feature. All your messages and media 
   }
 
   Future<void> _handleSubmitted(String text)  {
+
     try {
 
        FBCloudStore.instanace.sendMessageToChatRoom(widget.chatID,widget.myID,widget.selectedUserID,text,messageType);
        FBCloudStore.instanace.updateUserChatListField(widget.selectedUserID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
        FBCloudStore.instanace.updateUserChatListField(widget.myID, messageType == 'text' ? text : '(Photo)',widget.chatID,widget.myID,widget.selectedUserID);
-      _msgTextController.clear();
+
+      setState(() {
+        _isLoading=false;
+      });
     }catch(e){
       showAlertDialog(context,'Error user information to database');
 
@@ -782,11 +853,7 @@ This app's unique feature is "auto delete" feature. All your messages and media 
 
         }
     );
-
-
-
-
-  }
+      }
   Future update1() async {
     await _firestore
         .collection('chatroom').
@@ -804,6 +871,49 @@ This app's unique feature is "auto delete" feature. All your messages and media 
 
 
   }
+  String nameuser;
+  String Imgurl;
+  String phone;
+  Updaterecent() async {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(_userik.uid.toString()).get();
+    Map<String, dynamic> data = docSnapshot.data();
+    nameuser = data['name'];
+    Imgurl = data['userImageUrl'];
+    phone =data['phone'];
+
+    FirebaseFirestore.instance.collection("users").doc(
+        _userik.uid.toString()).collection('Mycontacts').doc(widget.selectedUserID).set({
+      'name':widget.selectedUserName,
+      'userId': widget.selectedUserID,
+      'FCMToken': widget.selectedUserToken,
+      'userImageUrl': widget.selectedUserThumbnail,
+      'phone': widget.phonenumber,
+      "lastchat":_msgTextController.text,
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+      'recent': true,
+      'badgeCount': isRoom ? 0 : userBadgeCount,
 
 
+
+    });
+    FirebaseFirestore.instance.collection("users").doc(widget.selectedUserID
+        ).collection('Mycontacts').doc(_userik.uid.toString()).set({
+      'name':nameuser,
+      'userId': _userik.uid.toString(),
+      'FCMToken': widget.myID,
+      'userImageUrl': Imgurl,
+      'phone': phone,
+      "lastchat":_msgTextController.text,
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+      'recent': true,
+      'badgeCount': isRoom ? 0 : userBadgeCount,
+
+
+
+    });
+    _msgTextController.clear();
+  }
+  var isRoom = false;
+  var userBadgeCount = 0;
 }

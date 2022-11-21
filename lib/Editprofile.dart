@@ -285,7 +285,15 @@ class _EditProfileState extends State<EditProfile> {
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(10),
-                                child: Text("+91 ${phone.toString()}")
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.phone,color: Color(0xffFE67C4),),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text("+91 ${phone.toString()}"),
+                                    ),
+                                  ],
+                                )
                               ),
                             ),
                           ),

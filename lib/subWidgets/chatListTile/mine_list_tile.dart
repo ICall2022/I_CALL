@@ -47,7 +47,7 @@ Widget mineListTile(BuildContext context, String message, String time, bool isRe
                       child: Container(
                           child: type == 'text' ? Text(message,
                             style: TextStyle(color: Colors.white),) :
-                          imageMessage(context,message)
+                          imageMessage(context,message,"You")
                       ),
                     ),
                   ),

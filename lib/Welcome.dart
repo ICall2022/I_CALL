@@ -1,10 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fast_contacts/fast_contacts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/Background2.dart';
 import 'package:i_call/Welcome2.dart';
 import 'package:i_call/login.dart';
 import 'package:i_call/rounded_button.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key key}) : super(key: key);
@@ -14,6 +19,83 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    getContact();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void getContact() async {
+
+    try {
+      await Permission.contacts.request();
+      final sw = Stopwatch()
+        ..start();
+      final contacts = await FastContacts.allContacts;
+      sw.stop();
+      _contacts = contacts;
+
+      for (int i = 0; i < _contacts.length; i++) {
+
+        FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
+          'name': _contacts[i].displayName.toString(),
+
+          'phone':  _contacts[i].phones.first.toString() != "" ? _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),'') : "null"
+
+
+
+        });
+
+      }
+    }
+    on PlatformException {
+
+    }
+  }
+  firsttime()async{
+    final snap = await FirebaseFirestore.instance.
+    collection('users')
+        .doc(_userik.uid.toString()) // varuId in your case
+        .get();
+
+    if (snap['first'] == 0) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 1
+      }
+      );
+    }
+    if (snap['first'] == 1) {
+
+
+      FirebaseFirestore.instance.
+      collection('users')
+          .doc(_userik.uid.toString()).update({
+
+        "first" : 2
+      }
+      );
+
+
+
+    }
+    if (snap['first'] == 2) {
+      setState(() {
+        first = 2;
+      });
+
+    }
+
+  }
+  int first;
+
+  User _userik = FirebaseAuth.instance.currentUser;
+  List<Contact> _contacts = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +163,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: TextButton(
                 onPressed: (){
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context)=> WelcomeScreen2())
+                    MaterialPageRoute(builder: (context)=> WelcomeScreen2(first))
                   );
                 },
                 child: Text("Next", style: GoogleFonts.poppins(

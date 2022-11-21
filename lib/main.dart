@@ -13,6 +13,7 @@ import 'package:i_call/Welcome.dart';
 import 'package:i_call/login.dart';
 import 'package:i_call/recent2.dart';
 import 'package:i_call/recentscreen.dart';
+import 'package:i_call/sharenow.dart';
 import 'package:i_call/subWidgets/common_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -39,7 +40,7 @@ import 'Controllers/fb_messaging.dart';
 import 'Controllers/image_controller.dart';
 import 'Controllers/utils.dart';
 import 'Home.dart';
-import 'chatroom.dart';
+
 import 'subWidgets/common_widgets.dart';
 import 'subWidgets/local_notification_view.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -94,9 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = false;
   User _user;
   String _userId;
-
+  Stream collectionStream;
   @override
   void initState() {
+
+     newuser();
+     collectionStream = FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('Mycontacts').snapshots();
+
     super.initState();
     NotificationController.instance.takeFCMTokenWhenAppLaunch();
     NotificationController.instance.initLocalNotification();
@@ -457,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _moveToChatList(List<String> userData) {
     setState(() => _isLoading = false);
     if(userData != null) {
-      Navigator.push(context,MaterialPageRoute(builder: (context) => recent()));
+      Navigator.push(context,MaterialPageRoute(builder: (context) => recentscreen(nameuser,Imgurl,chatno,collectionStream,phone)));
     }
     else { showAlertDialog(context,'Save user data error'); }
   }
@@ -477,6 +482,33 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  int i;
+  var nameuser;
+  var Imgurl;
+  var phone;
+
+  userdetail() async {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(_userik.uid.toString()).get();
+    Map<String, dynamic> data = docSnapshot.data();
+    nameuser = data['name'];
+    Imgurl = data['userImageUrl'];
+    phone = data['phone'];
+  }
+
+
+  int chatno = 1;
+  newuser()  async {
+
+    final result =  await FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('chatlist').limit(1).get();
+    if (result.size == 0) {
+      setState(() {
+        chatno = 2;
+
+      });
+
+    }
+  }
 
 }
 
@@ -576,7 +608,108 @@ class _TestState extends State<Test> {
       ),
     );
   }
+
 }
+
+class newcla extends StatefulWidget {
+  const newcla({Key key}) : super(key: key);
+
+  @override
+  State<newcla> createState() => _newclaState();
+}
+
+class _newclaState extends State<newcla> {
+  StreamSubscription _dataStreamSubscription;
+
+  String _sharedText = "";
+
+  List<SharedMediaFile> _sharedFiles;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Receive intent example"),
+      ),
+      body: Container(
+        margin: const EdgeInsets.only(top: 50, left: 10, right: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Shared Text is :",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Text(_sharedText, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 100),
+            const Text("Shared files:",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+            const SizedBox(
+              width: 5,
+            ),
+            if (_sharedFiles != null)
+              Text(_sharedFiles.map((f) => f.path).join(",") ?? "",
+                  style: const TextStyle(fontSize: 20)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    //Receive text data when app is running
+    _dataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String text) {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Sharenow(_sharedText,_sharedFiles)));
+          setState(() {
+            _sharedText = text;
+          });
+        });
+
+    //Receive text data when app is closed
+    ReceiveSharingIntent.getInitialText().then((String text) {
+      if (text != null) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Sharenow(_sharedText,_sharedFiles)));
+        setState(() {
+          _sharedText = text;
+        });
+      }
+    });
+
+    //Receive files when app is running
+    _dataStreamSubscription = ReceiveSharingIntent.getMediaStream()
+        .listen((List<SharedMediaFile> files) {
+      setState(() {
+        _sharedFiles = files;
+      });
+    });
+
+    //Receive files when app is closed
+    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> files) {
+      if (files != null) {
+        setState(() {
+          _sharedFiles = files;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _dataStreamSubscription.cancel();
+  }
+}
+
+
 class splashscreen extends StatefulWidget {
   const splashscreen({Key  key}) : super(key: key);
 
@@ -584,24 +717,6 @@ class splashscreen extends StatefulWidget {
   _splashscreenState createState() => _splashscreenState();
 }
 class _splashscreenState extends State<splashscreen> {
-
-  void initState() {
-
-    super.initState();
-    firsttime();
-    getContact();
-    userdetail();
-    newuser();
-    Timer(Duration(seconds: 3),
-
-            ()=>Navigator.pushReplacement(context,
-            MaterialPageRoute(builder:
-                (context) =>   recent2(first,nameuser,Imgurl,chatno),
-            )
-        )
-    );
-  }
-  User _userik = FirebaseAuth.instance.currentUser;
   firsttime()async{
     final snap = await FirebaseFirestore.instance.
     collection('users')
@@ -641,10 +756,35 @@ class _splashscreenState extends State<splashscreen> {
     }
 
   }
+  int first;
+
+
+  void initState() {
+
+    super.initState();
+    Stream collectionStream = FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('Mycontacts').snapshots();
+
+    Timer(Duration(seconds: 3),
+
+            ()=>Navigator.pushReplacement(context,
+            MaterialPageRoute(builder:
+                (context) =>   recentscreen(nameuser,Imgurl,chatno,collectionStream,phone),
+            )
+        )
+    );
+    firsttime();
+    getContact();
+    userdetail();
+
+    newuser();
+
+  }
+  User _userik = FirebaseAuth.instance.currentUser;
+
   int chatno = 1;
   newuser()  async {
 
-    final result =  await FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('chatlist').limit(1).get();
+    final result =  await FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('chatlist').get();
     if (result.size == 0) {
       setState(() {
         chatno = 2;
@@ -653,7 +793,7 @@ class _splashscreenState extends State<splashscreen> {
 
     }
   }
-  int first =0;
+
   @override
   Widget build(BuildContext context) {
 
@@ -685,6 +825,11 @@ class _splashscreenState extends State<splashscreen> {
     );
 
   }
+
+  DocumentReference getClientProfile() {
+    return FirebaseFirestore.instance.collection("").doc();
+  }
+
   int i;
   var nameuser;
   var Imgurl;
@@ -716,12 +861,16 @@ class _splashscreenState extends State<splashscreen> {
     }
   }
   List<Contact> _contacts = const [];
+  String phone ="";
   userdetail() async {
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(_userik.uid.toString()).get();
     Map<String, dynamic> data = docSnapshot.data();
+
     nameuser = data['name'];
     Imgurl = data['userImageUrl'];
+    phone =data['phone'];
+
   }
 }
 

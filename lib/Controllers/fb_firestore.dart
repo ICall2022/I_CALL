@@ -115,12 +115,14 @@ class FBCloudStore {
   Future updateUserChatListField(String documentID,String lastMessage,chatID,myID,selectedUserID) async{
 
     var userBadgeCount = 0;
+    var userBadgeCount2= 0;
     var isRoom = false;
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(documentID)
-        .collection('chatlist')
-        .doc(chatID)
+    var isRoom2 = false;
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("users").doc(
+        _userik.uid.toString()).collection('Mycontacts').doc(selectedUserID)
+        .get();
+    DocumentSnapshot userDoc2 = await  FirebaseFirestore.instance.collection("users").doc(selectedUserID
+    ).collection('Mycontacts').doc(_userik.uid.toString())
         .get();
 
     if(userDoc.data() != null) {
@@ -131,36 +133,34 @@ class FBCloudStore {
       }
     }else{
       userBadgeCount++;
+    }//user1
+    if(userDoc2.data() != null) {
+      isRoom2 = userDoc2['inRoom'] ?? false;
+      if(userDoc2 != null && documentID != _userik.uid && !userDoc2['inRoom']){
+        userBadgeCount2 = userDoc2['badgeCount'];
+        userBadgeCount2++;
+      }
+    }else{
+      userBadgeCount2++;
     }
 
-     FirebaseFirestore.instance
-        .collection('users')
-        .doc(documentID)
-        .collection('chatlist')
-        .doc(chatID)
-        .set({'chatID':chatID,
-      'chatWith':documentID == myID ? selectedUserID : myID,
-      'lastChat':lastMessage,
+    FirebaseFirestore.instance.collection("users").doc(
+        _userik.uid.toString()).collection('Mycontacts').doc(selectedUserID)
+        .update({
       'badgeCount': isRoom ? 0 : userBadgeCount,
       'inRoom':isRoom,
       'timestamp':DateTime.now().millisecondsSinceEpoch});
+    FirebaseFirestore.instance.collection("users").doc(selectedUserID
+    ).collection('Mycontacts').doc(_userik.uid.toString())
+        .update({
+
+      'badgeCount': isRoom2 ? 0 : userBadgeCount2,
+      'inRoom':isRoom2,
+      'timestamp':DateTime.now().millisecondsSinceEpoch});
   }
 
-  Future sendMessageToChatRoom(chatID,myID,selectedUserID,content,messageType) async {
-     FirebaseFirestore.instance
-        .collection('chatroom')
-        .doc(chatID)
-        .collection(chatID)
-        .doc(DateTime.now().millisecondsSinceEpoch.toString()).set({
-      'idFrom': _userik.uid,
-      'idTo': selectedUserID,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'content': content,
-      'type':messageType,
-      'isread':false,
-      'time': date.hour,
+  Future sendMessageToChatRoom(chatID,myID,selectedUserID,content,messagedatType) async {
 
-    });
      final result =  await FirebaseFirestore.instance.collection('chatroom').doc(chatID).collection(chatID).get();
      if (result.size == 0) {
        FirebaseFirestore.instance.collection('chatroom')

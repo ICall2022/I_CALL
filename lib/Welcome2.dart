@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_call/Background2.dart';
@@ -6,14 +8,149 @@ import 'package:i_call/rounded_button.dart';
 import 'package:lottie/lottie.dart';
 
 class WelcomeScreen2 extends StatefulWidget {
-  const WelcomeScreen2({Key key}) : super(key: key);
+  int first;
+  WelcomeScreen2(this.first);
 
   @override
   State<WelcomeScreen2> createState() => _WelcomeScreen2State();
 }
 
 class _WelcomeScreen2State extends State<WelcomeScreen2> {
+  User _userik = FirebaseAuth.instance.currentUser;
+  Mycontacts() async {
+    int i;
+    var document = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+    var docu = await  FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').get();
+    var allusers = await  FirebaseFirestore.instance.collection("users").get();
 
+    if(widget.first!=2){
+      for (i = 0; i < document.docs.length; i++) {
+        if (document.docs[i]['phone']
+            .toString()
+            .length >= 10) {
+          for (int j = 0; j < allusers.docs.length; j++) {
+            allusers.docs[j]['phone'].contains(
+                document.docs[i]['phone'].toString().substring(2)) ?
+            FirebaseFirestore.instance.collection("users").doc(
+                _userik.uid.toString()).collection('Mycontacts').doc(
+                allusers.docs[j]['userId']).set({
+              'name': document.docs[i]['name'].toString(),
+              'userId': allusers.docs[j]['userId'],
+              'FCMToken': allusers.docs[j]['FCMToken'],
+              'userImageUrl': allusers.docs[j]['userImageUrl'],
+              'phone': allusers.docs[j]['phone'],
+              'userId': allusers.docs[j]['userId'],
+
+
+            }) : null;
+          }
+        }
+        else {
+          for (int j = 0; j < allusers.docs.length; j++) {
+            allusers.docs[j]['phone'].contains(
+                document.docs[i]['phone'].toString()) ?
+            FirebaseFirestore.instance.collection("users").doc(
+                _userik.uid.toString()).collection('Mycontacts').doc(
+                allusers.docs[j]['userId']).set(
+                {
+                  'name': document.docs[i]['name'].toString(),
+                  'userId': allusers.docs[j]['userId'],
+                  'FCMToken': allusers.docs[j]['FCMToken'],
+                  'userImageUrl': allusers.docs[j]['userImageUrl'],
+                  'phone': allusers.docs[j]['phone'],
+                  'userId': allusers.docs[j]['userId'],
+                })
+
+                : null;
+          }
+        }
+      }
+
+    }
+
+    else {
+      for (i = 0; i < document.docs.length; i++) {
+        if (document.docs[i]['phone'].toString().length >= 10) {
+          for (int j = 0; j < allusers.docs.length; j++) {
+
+            final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('Mycontacts').doc(allusers.docs[j]['userId']).get();
+            if(docSnapshot.exists) {
+              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString().substring(2)) ?
+              FirebaseFirestore.instance.collection("users").doc(
+                  _userik.uid.toString()).collection('Mycontacts').doc(
+                  allusers.docs[j]['userId']).update({
+                'name': document.docs[i]['name'].toString(),
+                'userId': allusers.docs[j]['userId'],
+                'FCMToken': allusers.docs[j]['FCMToken'],
+                'userImageUrl': allusers.docs[j]['userImageUrl'],
+                'phone': allusers.docs[j]['phone'],
+                'userId': allusers.docs[j]['userId'],
+
+
+              }) : null;
+            }
+            else {
+              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString().substring(2)) ?
+              FirebaseFirestore.instance.collection("users").doc(
+                  _userik.uid.toString()).collection('Mycontacts').doc(
+                  allusers.docs[j]['userId']).set({
+                'name': document.docs[i]['name'].toString(),
+                'userId': allusers.docs[j]['userId'],
+                'FCMToken': allusers.docs[j]['FCMToken'],
+                'userImageUrl': allusers.docs[j]['userImageUrl'],
+                'phone': allusers.docs[j]['phone'],
+                'userId': allusers.docs[j]['userId'],
+
+
+              }) : null;
+
+            }
+
+          }
+        }
+        else {
+          for (int j = 0; j < allusers.docs.length; j++) {
+            final docSnapshot = await FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('Mycontacts').doc(allusers.docs[j]['userId']).get();
+            if(docSnapshot.exists) {
+              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString()) ?
+              FirebaseFirestore.instance.collection("users").doc(
+                  _userik.uid.toString()).collection('Mycontacts').doc(
+                  allusers.docs[j]['userId']).update(
+                  {
+                    'name': document.docs[i]['name'].toString(),
+                    'userId': allusers.docs[j]['userId'],
+                    'FCMToken': allusers.docs[j]['FCMToken'],
+                    'userImageUrl': allusers.docs[j]['userImageUrl'],
+                    'phone': allusers.docs[j]['phone'],
+                    'userId': allusers.docs[j]['userId'],
+                  })
+
+                  : null;
+            }
+            else {
+              allusers.docs[j]['phone'].contains(document.docs[i]['phone'].toString()) ?
+              FirebaseFirestore.instance.collection("users").doc(
+                  _userik.uid.toString()).collection('Mycontacts').doc(
+                  allusers.docs[j]['userId']).set(
+                  {
+                    'name': document.docs[i]['name'].toString(),
+                    'userId': allusers.docs[j]['userId'],
+                    'FCMToken': allusers.docs[j]['FCMToken'],
+                    'userImageUrl': allusers.docs[j]['userImageUrl'],
+                    'phone': allusers.docs[j]['phone'],
+                    'userId': allusers.docs[j]['userId'],
+                  })
+
+                  : null;
+
+            }
+
+          }
+        }
+      }
+    }
+
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
