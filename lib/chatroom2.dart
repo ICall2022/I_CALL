@@ -247,7 +247,6 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       {
         "status": "save",
 
-
       },);
 
 
@@ -713,6 +712,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
 
                             _handleSubmitted(_msgTextController.text);
                             Updaterecent();
+                            _getUnreadMSGCountThenSendMessage();
                             FirebaseFirestore.instance
                                 .collection('chatroom')
                                 .doc(widget.chatID)
@@ -727,7 +727,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                               'time': date.hour,
 
                             });
-                            _getUnreadMSGCountThenSendMessage();
+
 
 
 
@@ -824,7 +824,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       int unReadMSGCount = await FBCloudStore.instanace.getUnreadMSGCount(widget.selectedUserID);
       await NotificationController.instance.sendNotificationMessageToPeerUser(unReadMSGCount, messageType, _msgTextController.text, mynameon, widget.chatID, widget.selectedUserToken,widget.myImageUrl);
     }catch(e) {
-      //print(e.message);
+      print(e.message);
     }
 
   }
@@ -896,7 +896,8 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
 
 
 
-    });
+    }
+    );
     FirebaseFirestore.instance.collection("users").doc(widget.selectedUserID
         ).collection('Mycontacts').doc(_userik.uid.toString()).set({
       'name':nameuser,

@@ -40,13 +40,8 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
   void initState() {
     firsttime();
     userdetail();
-
-
     super.initState();
     NotificationController.instance.updateTokenToServer();
-
-
-
     if (mounted) {
       checkLocalNotification(localNotificationAnimation, "");
     }
@@ -95,6 +90,7 @@ class _ChatList extends State<ChatList2> with LocalNotificationView {
     }
 
   }
+
   int ln;
   int i=0;
   List  user =[];

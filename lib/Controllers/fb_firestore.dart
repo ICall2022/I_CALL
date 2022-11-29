@@ -159,15 +159,27 @@ class FBCloudStore {
       'timestamp':DateTime.now().millisecondsSinceEpoch});
   }
 
-  Future sendMessageToChatRoom(chatID,myID,selectedUserID,content,messagedatType) async {
+  Future sendMessageToChatRoom(chatID,myID,selectedUserID,content,messageType) async {
+    final result =  await FirebaseFirestore.instance.collection('chatroom').doc(chatID).collection(chatID).get();
+    if (result.size == 0) {
+      FirebaseFirestore.instance.collection('chatroom')
+          .doc(chatID).set({
+        "status": "not"
+      });
+    }
+    messageType != 'text' ?
+    await FirebaseFirestore.instance.collection('chatroom').doc(chatID)
+        .collection(chatID)
+        .doc(DateTime.now().millisecondsSinceEpoch.toString()).set({
+      'idFrom': _userik.uid,
+      'idTo': selectedUserID,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'content': content,
+      'type':messageType,
+      'isread':false,
+      'time': date.hour
+    }) : null;
 
-     final result =  await FirebaseFirestore.instance.collection('chatroom').doc(chatID).collection(chatID).get();
-     if (result.size == 0) {
-       FirebaseFirestore.instance.collection('chatroom')
-           .doc(chatID).set({
-         "status": "not"
-       });
-     }
 
   }
   Future < List < UserModel >  > getAppContacts ( ) async {

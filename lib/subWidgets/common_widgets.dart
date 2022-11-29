@@ -1,7 +1,11 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'full_photo.dart';
 
@@ -13,6 +17,23 @@ Widget loadingCircle(bool value,){
             width: 200,
             height: 200,
             child: Lottie.asset("assets/Loading2.json")),),
+      color: Colors.white.withOpacity(0.7),
+    ) : Container(),
+  );
+}
+Widget loadingCircle2(bool value,){
+  return Positioned(
+    child: value ? Container(
+      child: Center(
+        child:  Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+                width: 200,
+                height: 200,
+                child: Lottie.asset("assets/Loading2.json")),
+            Text("Your contacts list is being updated \n Kindly wait for a moment \n Please don't press back button",textAlign: TextAlign.center,style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),          ],
+        ),),
       color: Colors.white.withOpacity(0.7),
     ) : Container(),
   );
@@ -95,3 +116,5 @@ void showAlertDialog(context,String msg) {
       );
     });
 }
+
+

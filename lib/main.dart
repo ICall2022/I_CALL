@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:fast_contacts/fast_contacts.dart';
@@ -15,6 +16,7 @@ import 'package:i_call/recent2.dart';
 import 'package:i_call/recentscreen.dart';
 import 'package:i_call/sharenow.dart';
 import 'package:i_call/subWidgets/common_widgets.dart';
+import 'package:i_call/sync.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -100,6 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
 
      newuser();
+
+     getCurrentTag();
      collectionStream = FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection('Mycontacts').snapshots();
 
     super.initState();
@@ -110,6 +114,35 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     checkAuthStatus();
   }
+  User _userik = FirebaseAuth.instance.currentUser;
+  void getContact() async {
+
+    try {
+      await Permission.contacts.request();
+      final sw = Stopwatch()
+        ..start();
+      final contacts = await FastContacts.allContacts;
+      sw.stop();
+      _contacts = contacts;
+
+      for (int i = 0; i < _contacts.length; i++) {
+
+        FirebaseFirestore.instance.collection("users").doc(_userik.uid.toString()).collection('contacts').doc(i.toString()).set({
+          'name': _contacts[i].displayName.toString(),
+
+          'phone':  _contacts[i].phones.first.toString() != "" ? _contacts[i].phones.first.toString().replaceAll(new RegExp(r'[^0-9]'),'') : "null"
+
+
+
+        });
+
+      }
+    }
+    on PlatformException {
+
+    }
+  }
+  List<Contact> _contacts = const [];
 
   Future<void> checkAuthStatus() {
     FirebaseAuth.instance.authStateChanges().listen((User user) {
@@ -141,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
   }
-  User _userik = FirebaseAuth.instance.currentUser;
+
   String name;
   void onchanged(String value){
     setState(() {
@@ -160,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.of(context).pop();
             }, icon: Icon(Icons.arrow_back_ios_rounded)),
 
-            Text("Edit your profile"),
+            Text("Create your profile"),
 
           ],
         ),
@@ -462,7 +495,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _moveToChatList(List<String> userData) {
     setState(() => _isLoading = false);
     if(userData != null) {
-      Navigator.push(context,MaterialPageRoute(builder: (context) => recentscreen(nameuser,Imgurl,chatno,collectionStream,phone)));
+      Navigator.push(context,MaterialPageRoute(builder: (context) => Sync()));
     }
     else { showAlertDialog(context,'Save user data error'); }
   }
@@ -768,7 +801,7 @@ class _splashscreenState extends State<splashscreen> {
 
             ()=>Navigator.pushReplacement(context,
             MaterialPageRoute(builder:
-                (context) =>   recentscreen(nameuser,Imgurl,chatno,collectionStream,phone),
+                (context) =>   recentscreen(nameuser,Imgurl,chatno,phone),
             )
         )
     );

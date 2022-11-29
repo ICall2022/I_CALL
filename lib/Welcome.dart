@@ -21,7 +21,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
-    getContact();
+
     // TODO: implement initState
     super.initState();
   }
@@ -163,7 +163,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: TextButton(
                 onPressed: (){
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context)=> WelcomeScreen2(first))
+                    MaterialPageRoute(builder: (context)=> WelcomeScreen2())
                   );
                 },
                 child: Text("Next", style: GoogleFonts.poppins(
