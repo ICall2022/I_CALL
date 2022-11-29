@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:i_call/viewprofile.dart';
 import 'package:lottie/lottie.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:responsive_widgets/responsive_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Controllers/fb_firestore.dart';
@@ -272,16 +273,16 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title:  const Text('Do you want to save this chat ?'),
+          title:  const TextResponsive('Do you want to save this chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
               children:  <Widget>[
-                Container(
+                ContainerResponsive(
                     width: 200,
                     height: 200,
                     child: Lottie.asset("assets/Savechat.json")
                 ),
-                Text('This action will save your chat here after'),
+                TextResponsive('This action will save your chat here after'),
 
               ],
             ),
@@ -289,7 +290,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
           actions: <Widget>[
 
             TextButton(
-              child: const Text('Save Chat',style: TextStyle(color: Colors.blue),),
+              child: const TextResponsive('Save Chat',style: TextStyle(color: Colors.blue),),
               onPressed: () {
                 savechat1();
                 Navigator.pop(context);
@@ -309,16 +310,16 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title:  const Text('Are you sure of disabling the save chat ?'),
+          title:  const TextResponsive('Are you sure of disabling the save chat ?'),
           content: SingleChildScrollView(
             child: ListBody(
               children:  <Widget>[
-                Container(
+                ContainerResponsive(
                     width: 200,
                     height: 200,
                     child: Lottie.asset("assets/AREYOUSURE.json")
                 ),
-                Text('This action will delete all your chat happened in past' ),
+                TextResponsive('This action will delete all your chat happened in past' ),
 
               ],
             ),
@@ -326,7 +327,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
           actions: <Widget>[
 
             TextButton(
-              child: const Text('Disable Chat',style: TextStyle(color: Colors.blue),),
+              child: const TextResponsive('Disable Chat',style: TextStyle(color: Colors.blue),),
               onPressed: () {
                 savechat();
                 Navigator.pop(context);
@@ -346,255 +347,266 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        top:false,
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Row(
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.of(context).pop();
-                }, icon: const Icon(Icons.arrow_back_ios_rounded)),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) =>
-                                ViewProfile(widget.selectedUserThumbnail,
-                                    widget.selectedUserName,
-                                    widget.phonenumber))
-                        );
-                      },
-                    child: Container(
-                        width: 50,
-                        height: 50,
+    ResponsiveWidgets.init(
+      context,
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      allowFontScaling: false,
+    );
+    return ResponsiveWidgets.builder(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      allowFontScaling: false,
+      child: ContainerResponsive(
+        color: Colors.white,
+        child: SafeArea(
+          top:false,
+          child: Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: Row(
+                children: [
+                  IconButton(onPressed: (){
+                    Navigator.of(context).pop();
+                  }, icon: const Icon(Icons.arrow_back_ios_rounded)),
+                  Padding(
+                    padding:  EdgeInsetsResponsive.all(8.0),
+                    child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) =>
+                                  ViewProfile(widget.selectedUserThumbnail,
+                                      widget.selectedUserName,
+                                      widget.phonenumber))
+                          );
+                        },
+                      child: ContainerResponsive(
+                          width: 50,
+                          height: 50,
 
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: ImageController2.instance
-                                .cachedImage(widget.selectedUserThumbnail))
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: ImageController2.instance
+                                  .cachedImage(widget.selectedUserThumbnail))
 
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
-                      );
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                        );
 
-                    },
-                    child: Container(
-                        padding:  EdgeInsets.only(right: 30.0),
-                        child: Text(widget.selectedUserName.toString(), overflow: TextOverflow.ellipsis,  maxLines: 1,
-                          softWrap: false,)),
+                      },
+                      child: ContainerResponsive(
+                          padding:  EdgeInsetsResponsive.only(right: 30.0),
+                          child: TextResponsive(widget.selectedUserName.toString(), overflow: TextOverflow.ellipsis,  maxLines: 1,
+                            softWrap: false,)),
+                    ),
                   ),
-                ),
 
-              ],
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 50,
-                  height: 50,
+                ],
+              ),
+              actions: [
+                Padding(
+                  padding:  EdgeInsetsResponsive.all(8.0),
+                  child: ContainerResponsive(
+                    width: 50,
+                    height: 50,
 
-                  decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.20),
-                      borderRadius: BorderRadius.circular(20)
+                    decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.20),
+                        borderRadius: BorderRadius.circular(20)
 
-                  ),
-                  child: PopupMenuButton<int>(
-                      offset: const Offset(0, 40),
-                      color: Colors.white, 
-                      elevation: 2,
-                      shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-
-                        status == true?        PopupMenuItem(
-                          value: 3,
-
-
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(Icons.download_done_outlined,color: Colors.pinkAccent,),
-                                  SizedBox(
-// sized box with width 10
-                                    width: 10,
-                                  ),
-                                  Text("Chat is Saved")
-                                ],
-                              ),
-                              const  Divider(),
-                            ],
-                          ),
-                        ) : PopupMenuItem(
-
-                          value: 2,
-// row has two child icon and text
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(Icons.monitor_heart,color: Colors.pinkAccent,),
-                                  SizedBox(
-// sized box with width 10
-                                    width: 10,
-                                  ),
-                                  Text("Save Chat")
-                                ],
-                              ),
-                              const   Divider(),
-                            ],
-                          ),
+                    ),
+                    child: PopupMenuButton<int>(
+                        offset: const Offset(0, 40),
+                        color: Colors.white, 
+                        elevation: 2,
+                        shape: ContinuousRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        PopupMenuItem(
-                          value: 1,
+                        itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+
+                          status == true?        PopupMenuItem(
+                            value: 3,
 
 
-
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                   Icon(Icons.person,color: Colors.pinkAccent,),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: const [
+                                    Icon(Icons.download_done_outlined,color: Colors.pinkAccent,),
                                     SizedBox(
 // sized box with width 10
-                                    width: 10,
-                                  ),
-                                  Text("View Contact")
-                                ],
-                              ),
-                              Divider(),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onSelected: (value) {
-                        if(value == 2){
-                          Future.delayed(
-                              const Duration(seconds: 0),
-                                  () => _showMyDialog1());
-
-                        }
-                        else if(value == 1){
-
-                            Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
-                            );
-                        }
-                        else if(value == 3){
-                          Future.delayed(
-                              const Duration(seconds: 0),
-                                  () => _showMyDialog2());
-
-
-                        }
-                      }
-
-                  ),
-                ),
-              )
-            ],
-            toolbarHeight: 67,
-            flexibleSpace: Container(
-              height: 260,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(37),
-                  ),
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                        Color(0xffF84F9D),
-                        Color(0xffE868A3)
-                      ])
-              ),
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(37),
-              ),
-            ),
-            centerTitle: true,
-          ),
-          body: StreamBuilder<QuerySnapshot> (
-              stream: FirebaseFirestore.instance.
-              collection('chatroom').
-              doc(widget.chatID).
-              collection(widget.chatID).
-              orderBy('timestamp',descending: false).
-              snapshots(),
-              builder: (context,snapshot) {
-                if (!snapshot.hasData) return Center(child: const CircularProgressIndicator());
-                return Stack(
-                  children: <Widget>[
-                    Column(
-
-                      children: <Widget>[
-
-
-                        Expanded(
-                          child: ListView(
-                              reverse: true,
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.fromLTRB(4.0,10,4,10),
-                              controller: _chatListController,
-                              children: addInstructionInSnapshot(snapshot.data.docs).map(_returnChatWidget).toList()
-                          ),
-                        ),
-                        _isLoading == true ?  Padding(
-                          padding: const EdgeInsets.only(left: 170.0,right: 10),
-                          child: Container(
-                            width: 170,
-                            height: 170,
-                            decoration: BoxDecoration(
-                              gradient:  LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: <Color>[
-                                    Color(0xffF39EC4),
-                                    Color(0xffF39EC4)
-                                  ]),
-                              borderRadius: BorderRadius.circular(15.0),
+                                      width: 10,
+                                    ),
+                                    TextResponsive("Chat is Saved")
+                                  ],
+                                ),
+                                const  Divider(),
+                              ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
-                                    gradient:  LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: <Color>[
-                                          Color(0xffF39EC4),
-                                          Color(0xffF39EC4)
-                                        ]),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  child: loadingCircle(true)),
+                          ) : PopupMenuItem(
+
+                            value: 2,
+// row has two child icon and text
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: const [
+                                    Icon(Icons.monitor_heart,color: Colors.pinkAccent,),
+                                    SizedBox(
+// sized box with width 10
+                                      width: 10,
+                                    ),
+                                    TextResponsive("Save Chat")
+                                  ],
+                                ),
+                                const   Divider(),
+                              ],
                             ),
                           ),
-                        ) : Container(),
-                        _buildTextComposer(),
-                      ],
+                          PopupMenuItem(
+                            value: 1,
+
+
+
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: const [
+                                     Icon(Icons.person,color: Colors.pinkAccent,),
+                                      SizedBox(
+// sized box with width 10
+                                      width: 10,
+                                    ),
+                                    TextResponsive("View Contact")
+                                  ],
+                                ),
+                                Divider(),
+                              ],
+                            ),
+                          ),
+                        ],
+                        onSelected: (value) {
+                          if(value == 2){
+                            Future.delayed(
+                                const Duration(seconds: 0),
+                                    () => _showMyDialog1());
+
+                          }
+                          else if(value == 1){
+
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context)=> ViewProfile(widget.selectedUserThumbnail,widget.selectedUserName,widget.phonenumber))
+                              );
+                          }
+                          else if(value == 3){
+                            Future.delayed(
+                                const Duration(seconds: 0),
+                                    () => _showMyDialog2());
+
+
+                          }
+                        }
+
                     ),
-                    localNotificationCard(size)
-                  ],
-                );
-              }
+                  ),
+                )
+              ],
+              toolbarHeight: 67,
+              flexibleSpace: ContainerResponsive(
+                height: 260,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(37),
+                    ),
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: <Color>[
+                          Color(0xffF84F9D),
+                          Color(0xffE868A3)
+                        ])
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(37),
+                ),
+              ),
+              centerTitle: true,
+            ),
+            body: StreamBuilder<QuerySnapshot> (
+                stream: FirebaseFirestore.instance.
+                collection('chatroom').
+                doc(widget.chatID).
+                collection(widget.chatID).
+                orderBy('timestamp',descending: false).
+                snapshots(),
+                builder: (context,snapshot) {
+                  if (!snapshot.hasData) return Center(child: const CircularProgressIndicator());
+                  return Stack(
+                    children: <Widget>[
+                      Column(
+
+                        children: <Widget>[
+
+
+                          Expanded(
+                            child: ListView(
+                                reverse: true,
+                                shrinkWrap: true,
+                                padding:  EdgeInsetsResponsive.fromLTRB(4.0,10,4,10),
+                                controller: _chatListController,
+                                children: addInstructionInSnapshot(snapshot.data.docs).map(_returnChatWidget).toList()
+                            ),
+                          ),
+                          _isLoading == true ?  Padding(
+                            padding:  EdgeInsetsResponsive.only(left: 170.0,right: 10),
+                            child: ContainerResponsive(
+                              width: 170,
+                              height: 170,
+                              decoration: BoxDecoration(
+                                gradient:  LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: <Color>[
+                                      Color(0xffF39EC4),
+                                      Color(0xffF39EC4)
+                                    ]),
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Padding(
+                                padding:  EdgeInsetsResponsive.all(4.0),
+                                child: ContainerResponsive(
+                                    width: 160,
+                                    height: 160,
+                                    decoration: BoxDecoration(
+                                      gradient:  LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: <Color>[
+                                            Color(0xffF39EC4),
+                                            Color(0xffF39EC4)
+                                          ]),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: loadingCircle(true)),
+                              ),
+                            ),
+                          ) : ContainerResponsive(),
+                          _buildTextComposer(),
+                        ],
+                      ),
+                      localNotificationCard(size)
+                    ],
+                  );
+                }
+            ),
           ),
         ),
       ),
@@ -635,10 +647,10 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
     return IconTheme(
       data:  IconThemeData(color: Theme.of(context).colorScheme.secondary),
       child: Padding(
-        padding: const EdgeInsets.only(top: 12.0,left: 15.0,right: 15.0,bottom: 30),
+        padding:  EdgeInsetsResponsive.only(top: 12.0,left: 15.0,right: 15.0,bottom: 30),
         child: Column(
           children: [
-            Container(
+            ContainerResponsive(
               height: 67,
               width: 366,
               decoration: BoxDecoration(
@@ -647,8 +659,8 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
               ),
               child: Row(
                   children: <Widget>[
-                     Container(
-                      margin:  EdgeInsets.symmetric(horizontal: 2.0),
+                     ContainerResponsive(
+                      margin:  EdgeInsetsResponsive.symmetric(horizontal: 2.0),
                       child:  IconButton(
                           icon: const Icon(Icons.emoji_emotions_outlined,color: Color(0xffFC1982),),
                           onPressed: () {
@@ -669,10 +681,10 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                     ),
                     RotationTransition(
                       turns: AlwaysStoppedAnimation(30 / 360),
-                      child:  Container(
+                      child:  ContainerResponsive(
 
 
-                        margin:  EdgeInsets.symmetric(horizontal: 2.0),
+                        margin:  EdgeInsetsResponsive.symmetric(horizontal: 2.0),
                         child:  IconButton(
 
                             icon:  Icon(Icons.attach_file_rounded,color: Color(0xffFC1982),),
@@ -696,15 +708,15 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top:8.0,bottom: 8,right: 8,left: 1),
-                      child:  Container(
+                      padding:  EdgeInsetsResponsive.only(top:8.0,bottom: 8,right: 8,left: 1),
+                      child:  ContainerResponsive(
                         height: 52,
                         width: 52,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
                           color: Color(0xffFC1982),
                         ),
-                        margin:  EdgeInsets.symmetric(horizontal: 2.0),
+                        margin:  EdgeInsetsResponsive.symmetric(horizontal: 2.0),
                         child: GestureDetector(
                           onTap: (){
 
@@ -746,7 +758,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
             Offstage(
               offstage: !emojiShowing,
               child: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding:  EdgeInsetsResponsive.only(top: 8.0),
                 child: SizedBox(
                   height: 250,
                   child: EmojiPicker(
@@ -762,7 +774,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                           emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
                           verticalSpacing: 0,
                           horizontalSpacing: 0,
-                          gridPadding: EdgeInsets.zero,
+                          gridPadding: EdgeInsetsResponsive.zero,
                           initCategory: Category.RECENT,
                           bgColor: const Color(0xFFF2F2F2),
                           indicatorColor: Color(0xffFC1982),
@@ -776,7 +788,7 @@ class _ChatRoom2State extends State<ChatRoom2> with WidgetsBindingObserver,Local
                           showRecentsTab: true,
                           recentsLimit: 28,
                           replaceEmojiOnLimitExceed: false,
-                          noRecents: const Text(
+                          noRecents: const TextResponsive(
                             'No Recents',
                             style: TextStyle(fontSize: 20, color: Colors.black26),
                             textAlign: TextAlign.center,

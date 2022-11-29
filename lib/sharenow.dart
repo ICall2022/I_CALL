@@ -15,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:responsive_widgets/responsive_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -130,164 +131,222 @@ class _Sharenow extends State<Sharenow> with LocalNotificationView {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: i ==0 ? AppBar(
-        toolbarHeight: 90,
-        backgroundColor: const Color(0xffF84F9D),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title:Row(
-          children: [
+    final size = MediaQuery.of(context).size;
+    ResponsiveWidgets.init(
+      context,
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      allowFontScaling: false,
+    );
+    return ResponsiveWidgets.builder(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      allowFontScaling: false,
+      child: Scaffold(
+        appBar: i ==0 ? AppBar(
+          toolbarHeight: 90,
+          backgroundColor: const Color(0xffF84F9D),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title:Row(
+            children: [
 
 
 
-            const   Text('Your contacts on I CALL',style: TextStyle(fontSize: 17),),
-            Padding(
-              padding:  EdgeInsets.only(left:30.0),
-              child: GestureDetector(
-                onTap: (){
-                  setState(() {
-                    i=1;
-                  });
+              const   TextResponsive('Your contacts on I CALL',style: TextStyle(fontSize: 17),),
+              Padding(
+                padding:  EdgeInsetsResponsive.only(left:30.0),
+                child: GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      i=1;
+                    });
 
-                },
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  child: Icon(Icons.search),
-                  decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.20),
-                      borderRadius: BorderRadius.circular(20)
+                  },
+                  child: ContainerResponsive(
+                    width: 50,
+                    height: 50,
+                    child: Icon(Icons.search),
+                    decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.20),
+                        borderRadius: BorderRadius.circular(20)
+
+                    ),
 
                   ),
-
                 ),
               ),
-            ),
 
-          ],
-        ),
-
-
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(37),
+            ],
           ),
-        ),
-      ) : AppBar(
-        toolbarHeight: 90,
-        backgroundColor: Color(0xffF84F9D),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.0)
-            ),
 
-            child: TextField(
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.sentences,
 
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon:const Icon(Icons.search, ), hintText: 'Search...'),
-              onChanged: (val) {
-                setState(() {
-                  name = val;
-                });
-              },
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(37),
             ),
           ),
-        ),
-        flexibleSpace: Container(
-          height: 260,
-          decoration:const BoxDecoration(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(37),
+        ) : AppBar(
+          toolbarHeight: 90,
+          backgroundColor: Color(0xffF84F9D),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: Padding(
+            padding:  EdgeInsetsResponsive.only(right: 8.0),
+            child: ContainerResponsive(
+              height: 60,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0)
               ),
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    Color(0xffF84F9D),
-                    Color(0xffE868A3)
-                  ])
+
+              child: TextField(
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
+
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon:const Icon(Icons.search, ), hintText: 'Search...'),
+                onChanged: (val) {
+                  setState(() {
+                    name = val;
+                  });
+                },
+              ),
+            ),
+          ),
+          flexibleSpace: ContainerResponsive(
+            height: 260,
+            decoration:const BoxDecoration(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(37),
+                ),
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      Color(0xffF84F9D),
+                      Color(0xffE868A3)
+                    ])
+            ),
+          ),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(37),
+            ),
           ),
         ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(37),
-          ),
-        ),
-      ),
-      body:  StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('users').snapshots(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
-            if(userSnapshot.hasData  ) {
-              return ListView(
-                  shrinkWrap: true,
-                  children: userSnapshot.data.docs.map((userData1) {
-                    return StreamBuilder(
-                        stream: (name != "" && name != null)
-                            ? FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection("contacts")
-                            .where('name', isGreaterThanOrEqualTo: name).where('name', isLessThan: name + 'z').snapshots()
-                            : FirebaseFirestore.instance.collection('users')
-                            .doc(_userik.uid.toString())
-                            .collection("contacts")
-                            .snapshots(),
-                        builder: (context, AsyncSnapshot<
-                            QuerySnapshot> snapshots) {
+        body:  StreamBuilder(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
+              if(userSnapshot.hasData  ) {
+                return ListView(
+                    shrinkWrap: true,
+                    children: userSnapshot.data.docs.map((userData1) {
+                      return StreamBuilder(
+                          stream: (name != "" && name != null)
+                              ? FirebaseFirestore.instance.collection('users').doc(_userik.uid.toString()).collection("contacts")
+                              .where('name', isGreaterThanOrEqualTo: name).where('name', isLessThan: name + 'z').snapshots()
+                              : FirebaseFirestore.instance.collection('users')
+                              .doc(_userik.uid.toString())
+                              .collection("contacts")
+                              .snapshots(),
+                          builder: (context, AsyncSnapshot<
+                              QuerySnapshot> snapshots) {
 
 
-                          return ListView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: snapshots.data.docs.map((
-                                  userData) {
-                                if (userData['phone'].toString().length >= 10) {
-                                  return userData1['phone'].contains(userData['phone'].toString().substring(2)) ? Padding(
-                                    padding: const EdgeInsets.all(
-                                        8.0),
-                                    child: ListTile(
+                            return ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: snapshots.data.docs.map((
+                                    userData) {
+                                  if (userData['phone'].toString().length >= 10) {
+                                    return userData1['phone'].contains(userData['phone'].toString().substring(2)) ? Padding(
+                                      padding:  EdgeInsetsResponsive.all(
+                                          8.0),
+                                      child: ListTile(
 
+                                          leading: ClipRRect(
+                                            borderRadius: BorderRadius
+                                                .circular(15),
+                                            child: ImageController
+                                                .instance.cachedImage(
+                                                userData1['userImageUrl']),
+                                          ),
+                                          title: TextResponsive(userData['name'],
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight
+                                                    .bold),),
+
+
+                                          onTap: () {
+                                            print(
+                                                "name ${userData['name']}");
+                                            String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (
+                                                        context) =>
+                                                        ChatRoom2(
+                                                          _userik.uid.toString(),
+                                                          name.toString(),
+                                                          Imgurl.toString(),
+                                                          userData1['FCMToken'],
+                                                          userData1['userId'],
+                                                          chatID,
+                                                          userData['name'],
+                                                          userData1['userImageUrl'],
+                                                          userData1['phone'],
+                                                            widget.text,
+                                                            widget.fileimg,
+                                                          myphone
+
+
+                                                        )));
+                                          }),
+                                    ) : const SizedBox();
+                                  }
+                                  else {
+                                    return userData1['phone'].contains(
+                                        userData['phone'].toString())
+                                        ? Padding(
+                                      padding:  EdgeInsetsResponsive.all(
+                                          8.0),
+                                      child: ListTile(
                                         leading: ClipRRect(
                                           borderRadius: BorderRadius
                                               .circular(15),
                                           child: ImageController
-                                              .instance.cachedImage(
+                                              .instance
+                                              .cachedImage(
                                               userData1['userImageUrl']),
                                         ),
-                                        title: Text(userData['name'],
-                                          style: const TextStyle(
-                                              fontSize: 20,
+                                        title: TextResponsive(userData['name'],
+                                          style:const TextStyle(fontSize: 20,
                                               fontWeight: FontWeight
                                                   .bold),),
 
 
                                         onTap: () {
-                                          print(
-                                              "name ${userData['name']}");
+                                          // print("name ${userData['name']}");
                                           String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                  builder: (
-                                                      context) =>
+                                                  builder: (context) =>
                                                       ChatRoom2(
                                                         _userik.uid.toString(),
                                                         name.toString(),
@@ -298,80 +357,34 @@ class _Sharenow extends State<Sharenow> with LocalNotificationView {
                                                         userData['name'],
                                                         userData1['userImageUrl'],
                                                         userData1['phone'],
-                                                          widget.text,
-                                                          widget.fileimg,
+                                                        widget.text,
+                                                        widget.fileimg,
                                                         myphone
 
-
                                                       )));
-                                        }),
-                                  ) : const SizedBox();
-                                }
-                                else {
-                                  return userData1['phone'].contains(
-                                      userData['phone'].toString())
-                                      ? Padding(
-                                    padding: const EdgeInsets.all(
-                                        8.0),
-                                    child: ListTile(
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius
-                                            .circular(15),
-                                        child: ImageController
-                                            .instance
-                                            .cachedImage(
-                                            userData1['userImageUrl']),
+                                        },
                                       ),
-                                      title: Text(userData['name'],
-                                        style:const TextStyle(fontSize: 20,
-                                            fontWeight: FontWeight
-                                                .bold),),
+                                    )
+                                        : SizedBox();
+                                  }
+                                }).toList()
+                            );
 
+                          }
+                      );
+                    }).toList()
 
-                                      onTap: () {
-                                        // print("name ${userData['name']}");
-                                        String chatID = makeChatId(_userik.uid.toString(), userData1['userId']);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ChatRoom2(
-                                                      _userik.uid.toString(),
-                                                      name.toString(),
-                                                      Imgurl.toString(),
-                                                      userData1['FCMToken'],
-                                                      userData1['userId'],
-                                                      chatID,
-                                                      userData['name'],
-                                                      userData1['userImageUrl'],
-                                                      userData1['phone'],
-                                                      widget.text,
-                                                      widget.fileimg,
-                                                      myphone
-
-                                                    )));
-                                      },
-                                    ),
-                                  )
-                                      : SizedBox();
-                                }
-                              }).toList()
-                          );
-
-                        }
-                    );
-                  }).toList()
-
+                );
+              }
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-      ),
+        ),
 
+      ),
     );
   }
 

@@ -49,6 +49,7 @@ dependencies:
   firestore_cache: any
   flutter_sms: ^2.3.3
 
+
   #Image pick from library, crop image after pick image.
   image_picker: ^0.8.5+3
   image_cropper: ^1.4.0
